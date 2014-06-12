@@ -1,11 +1,11 @@
 <?php
-use IRedisent\Connection\ConnectionInterface;
-use IRedisent\Connection\Factory;
+use Irediscent\Connection\ConnectionInterface;
+use Irediscent\Connection\Factory;
 
 
-class IRedisent {
+class Irediscent {
     /**
-     * @var \IRedisent\Connection\ConnectionInterface;
+     * @var \Irediscent\Connection\ConnectionInterface;
      */
     protected $connection;
 

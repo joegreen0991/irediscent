@@ -1,8 +1,8 @@
-<?php namespace IRedisent\Connection;
+<?php namespace Irediscent\Connection;
 
-use IRedisent\Exception\ConnectionException;
-use IRedisent\Exception\RedisException;
-use IRedisent\Exception\UnknownResponseException;
+use Irediscent\Exception\ConnectionException;
+use Irediscent\Exception\RedisException;
+use Irediscent\Exception\UnknownResponseException;
 
 class Redisent extends ConnectionAbstract {
 

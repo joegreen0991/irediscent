@@ -1,24 +1,24 @@
-<?php namespace tests\IRedisent;
+<?php namespace tests\Irediscent;
 
-use IRedisent;
+use Irediscent;
 
-class IRedisentTest extends \PHPUnit_Framework_TestCase
+class IrediscentTest extends \PHPUnit_Framework_TestCase
 {
 
     public function getObjectAndMock()
     {
-        $connection = $this->getMock('IRedisent\Connection\ConnectionInterface');
+        $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
         // Configure the stub.
         $connection->expects($this->any())
                    ->method('connect');
 
-        return array(new IRedisent($connection), $connection);
+        return array(new Irediscent($connection), $connection);
     }
 
     public function testObjectConnectsWithPassword()
     {
-        $connection = $this->getMock('IRedisent\Connection\ConnectionInterface');
+        $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
         // Configure the stub.
         $connection->expects($this->once())
@@ -28,7 +28,7 @@ class IRedisentTest extends \PHPUnit_Framework_TestCase
         $connection->expects($this->once())
                    ->method('write', array('auth','password'));
 
-        new IRedisent($connection, 'password');
+        new Irediscent($connection, 'password');
     }
 
     public function testPipeline()

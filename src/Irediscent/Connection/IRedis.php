@@ -1,4 +1,4 @@
-<?php namespace IRedisent\Connection;
+<?php namespace Irediscent\Connection;
 
 class IRedis extends ConnectionAbstract {
 

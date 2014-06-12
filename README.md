@@ -12,7 +12,7 @@ Install via composer
 
 {
     "require": {
-        "joegreen0991/iredisent": "*"
+        "joegreen0991/irediscent": "*"
     }
 }
 ~~~
@@ -24,7 +24,7 @@ Basic usage
 
 ~~~
 
-$redis = new IRedisent();
+$redis = new Irediscent();
 
 $redis->set('test',1);
 
@@ -36,7 +36,7 @@ Pipeline
 
 ~~~
 
-$redis = new IRedisent();
+$redis = new Irediscent();
 
 
 $redis->pipeline(function($redis){
@@ -63,7 +63,7 @@ MultiExec
 
 ~~~
 
-$redis = new IRedisent();
+$redis = new Irediscent();
 
 
 $redis->multiExec(function($redis){
