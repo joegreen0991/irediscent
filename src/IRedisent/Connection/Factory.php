@@ -1,8 +1,5 @@
 <?php namespace IRedisent\Connection;
 
-use Redis\Connection\IRedis;
-use Redis\Connection\Redisent;
-
 class Factory {
 
     protected $dsn;

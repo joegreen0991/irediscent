@@ -1,12 +1,5 @@
 <?php namespace IRedisent\Connection;
 
-/**
- * Wraps native Redis errors in friendlier PHP exceptions
- */
-class RedisException extends \Exception {
-}
-
-
 abstract class ConnectionAbstract implements ConnectionInterface {
 
     /**

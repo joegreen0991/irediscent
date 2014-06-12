@@ -1,4 +1,4 @@
-<?php namespace IRedisent;
+<?php
 use IRedisent\Connection\ConnectionInterface;
 use IRedisent\Connection\Factory;
 

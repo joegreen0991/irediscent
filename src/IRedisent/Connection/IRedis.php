@@ -1,4 +1,4 @@
-<?php namespace Redis\Connection;
+<?php namespace IRedisent\Connection;
 
 class IRedis extends ConnectionAbstract {
 
