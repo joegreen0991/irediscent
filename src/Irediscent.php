@@ -44,7 +44,7 @@ class Irediscent {
 
         $this->password = $password;
 
-        $this->options = $this->defaultOptions + $options;
+        $this->options = $options + $this->defaultOptions;
 
         $this->connect();
     }
@@ -56,7 +56,10 @@ class Irediscent {
     {
         $this->connection->connect();
 
-        $this->password and $this->auth($this->password);
+        if($this->password)
+        {
+            $this->auth($this->password);
+        }
 
         if($this->options['database'])
         {
