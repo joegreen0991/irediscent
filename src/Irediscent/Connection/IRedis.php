@@ -4,7 +4,14 @@ class IRedis extends ConnectionAbstract {
 
     public function connect()
     {
-        $this->redis = phpiredis_connect($this->host, $this->port);
+        $connection = $this->dsn->getMasterDsn();
+
+        $this->redis = $this->redis = phpiredis_connect($connection['host'], $connection['port']);
+
+        if ($this->redis === false)
+        {
+            throw new ConnectionException("Could not connect to {$connection['host']}:{$connection['port']}");
+        }
     }
 
     public function disconnect()
@@ -14,6 +21,8 @@ class IRedis extends ConnectionAbstract {
 
     public function write($data)
     {
+        $this->safeConnect();
+
         // Handle issue with 'phpiredis_command_bs' where params must be strings
         // Doesnt affect 'phpiredis_multi_command_bs'
         return phpiredis_command_bs($this->redis, array_map('strval', $data));
@@ -21,6 +30,8 @@ class IRedis extends ConnectionAbstract {
 
     public function multiWrite($data)
     {
+        $this->safeConnect();
+
         return phpiredis_multi_command_bs($this->redis, $data);
     }
 }

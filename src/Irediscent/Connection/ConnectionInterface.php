@@ -6,6 +6,8 @@ interface ConnectionInterface{
 
     public function disconnect();
 
+    public function reconnect();
+
     public function write($data);
 
     public function multiWrite($data);

@@ -1,25 +1,47 @@
 <?php namespace Irediscent\Connection;
 
 use Irediscent\Exception\ConnectionException;
+use Irediscent\Exception\TransmissionException;
 use Irediscent\Exception\RedisException;
 use Irediscent\Exception\UnknownResponseException;
 
-class Redisent extends ConnectionAbstract {
+class SocketConnection extends ConnectionAbstract {
+
+    protected $timeout;
+
+    protected $socket;
+
+    public function __construct($dsn = null, $timeout = null)
+    {
+        $this->timeout = $timeout;
+
+        $this->socket = new SocketObject();
+
+        parent::__construct($dsn);
+    }
+
+    public function setSocketObject(SocketObject $socketObject)
+    {
+        $this->socket = $socketObject;
+    }
 
     public function connect()
     {
-        $timeout = ini_get("default_socket_timeout");
+        $timeout = $this->timeout ?: ini_get("default_socket_timeout");
 
-        $this->redis = @fsockopen($this->host, $this->port, $errno, $errstr, $timeout);
+        $connection = $this->dsn->getMasterDsn();
 
-        if ($this->redis === false) {
-            throw new \Exception("{$errno} - {$errstr}");
+        $this->redis = $this->socket->open($connection['host'], $connection['port'], $errno, $errstr, $timeout);
+
+        if ($this->redis === false)
+        {
+            throw new ConnectionException("Could not connect to {$connection['host']}:{$connection['port']}; {$errno} - {$errstr}");
         }
     }
 
     public function disconnect()
     {
-        fclose($this->redis);
+        $this->socket->close($this->redis);
 
         $this->redis = null;
     }
@@ -51,6 +73,8 @@ class Redisent extends ConnectionAbstract {
 
     private function writeRaw($data)
     {
+        $this->safeConnect();
+
         $crlf = "\r\n";
         $command = '*' . count($data) . $crlf;
         foreach ($data as $arg) {
@@ -59,18 +83,18 @@ class Redisent extends ConnectionAbstract {
 
         for ($written = 0; $written < strlen($command); $written += $fwrite)
         {
-            $fwrite = fwrite($this->redis, substr($command, $written));
+            $fwrite = $this->socket->write($this->redis, substr($command, $written));
 
             if ($fwrite === FALSE || $fwrite <= 0)
             {
-                throw new \Exception('Failed to write entire command to stream');
+                throw new TransmissionException('Failed to write entire command to stream');
             }
         }
     }
 
     private function readResponse() {
         /* Parse the response based on the reply identifier */
-        $reply = trim(fgets($this->redis, 512));
+        $reply = trim($this->socket->gets($this->redis, 512));
         switch (substr($reply, 0, 1)) {
             /* Error reply */
             case '-':
@@ -94,16 +118,16 @@ class Redisent extends ConnectionAbstract {
                 if ($size > 0) {
                     do {
                         $block_size = ($size - $read) > 1024 ? 1024 : ($size - $read);
-                        $r = fread($this->redis, $block_size);
+                        $r = $this->socket->read($this->redis, $block_size);
                         if ($r === FALSE) {
-                            throw new ConnectionException('Failed to read response from stream');
+                            throw new TransmissionException('Failed to read response from stream');
                         } else {
                             $read += strlen($r);
                             $response .= $r;
                         }
                     } while ($read < $size);
                 }
-                fread($this->redis, 2); /* discard crlf */
+                $this->socket->read($this->redis, 2); /* discard crlf */
                 break;
             /* Multi-bulk reply */
             case '*':

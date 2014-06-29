@@ -4,6 +4,7 @@ use Irediscent\Connection\Factory;
 
 
 class Irediscent {
+
     /**
      * @var \Irediscent\Connection\ConnectionInterface;
      */
@@ -24,16 +25,26 @@ class Irediscent {
     private $queue = array();
 
     /**
+     * @var array
+     */
+    private $defaultOptions = array(
+        'database' => 0,
+        'timeout' => 5
+    );
+
+    /**
      * Creates a Redisent connection to the Redis server at the address specified by {@link $dsn}.
      * The default connection is to the server running on localhost on port 6379.
      * @param string $dsn The data source name of the Redis server
      * @param float $timeout The connection timeout in seconds
      */
-    public function __construct($connection = null, $password = null)
+    public function __construct($connection = null, $password = null, array $options = array())
     {
         $this->connection = $connection instanceof ConnectionInterface ? $connection : Factory::make($connection);
 
         $this->password = $password;
+
+        $this->options = $this->defaultOptions + $options;
 
         $this->connect();
     }
@@ -46,6 +57,11 @@ class Irediscent {
         $this->connection->connect();
 
         $this->password and $this->auth($this->password);
+
+        if($this->options['database'])
+        {
+            $this->select($this->options['database']);
+        }
     }
 
     /**

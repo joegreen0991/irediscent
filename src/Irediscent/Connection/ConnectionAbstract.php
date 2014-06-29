@@ -1,5 +1,8 @@
 <?php namespace Irediscent\Connection;
 
+use Irediscent\DsnProvider\DsnProviderInterface;
+use Irediscent\DsnProvider\StaticProvider;
+
 abstract class ConnectionAbstract implements ConnectionInterface {
 
     /**
@@ -10,15 +13,43 @@ abstract class ConnectionAbstract implements ConnectionInterface {
     protected $redis;
 
     /**
-     * Creates a Redisent connection to the Redis server at the address specified by {@link $dsn}.
-     * The default connection is to the server running on localhost on port 6379.
-     * @param string $dsn The data source name of the Redis server
-     * @param float $timeout The connection timeout in seconds
+     * @var \Irediscent\DsnProvider\DsnProviderInterface
      */
-    public function __construct($dsn = null) {
-        $dsn = parse_url($dsn);
-        $this->host = isset($this->dsn['host']) ? $dsn['host'] : 'localhost';
-        $this->port = isset($this->dsn['port']) ? $dsn['port'] : 6379;
+    protected $dsn;
+
+    public function __construct($dsn = null)
+    {
+        $this->dsn = $dsn instanceof DsnProviderInterface ? $dsn : new StaticProvider($dsn);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConnected()
+    {
+        return $this->redis !== null;
+    }
+
+    /*
+     *
+     */
+    protected function safeConnect()
+    {
+        if(!$this->isConnected())
+        {
+            $this->connect();
+        }
+    }
+
+    /**
+     *
+     */
+    public function reconnect()
+    {
+        if($this->isConnected())
+        {
+            $this->disconnect();
+        }
 
         $this->connect();
     }
