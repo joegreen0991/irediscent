@@ -48,6 +48,8 @@ class SocketConnection extends ConnectionAbstract {
 
     public function write($data)
     {
+        $this->safeConnect();
+
         $this->writeRaw($data);
 
         return $this->readResponse();
@@ -55,6 +57,8 @@ class SocketConnection extends ConnectionAbstract {
 
     public function multiWrite($data)
     {
+        $this->safeConnect();
+
         /* Open a Redis connection and execute the queued commands */
         foreach ($data as $rawCommand)
         {
@@ -73,8 +77,6 @@ class SocketConnection extends ConnectionAbstract {
 
     private function writeRaw($data)
     {
-        $this->safeConnect();
-
         $crlf = "\r\n";
         $command = '*' . count($data) . $crlf;
         foreach ($data as $arg) {
