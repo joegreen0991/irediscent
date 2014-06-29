@@ -1,5 +1,5 @@
 {
-    "name" : "joegreen0991/irediscent",
+    "name" : "irediscent/irediscent",
     "type": "library",
     "description": "Lightweight php handler for iredis with redisent fallback",
     "keywords": ["Irediscent","redis", "iredis", "redisent", "lightweight"],

@@ -156,6 +156,11 @@ class Irediscent {
             return $this->connection->write($args);
         }
     }
+    
+    public function execute($command, $_args = array())
+    {
+        return $this->executeCommand($command, is_array($_args) ? $_args : array_slice(func_get_args(),1));
+    }
 
     public function __call($name, $args)
     {
