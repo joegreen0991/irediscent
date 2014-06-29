@@ -49,12 +49,12 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('#resource'))
             ->will($this->returnValue(":1\r\n"));
 
-        $mock->expects($this->any(7))
+        $mock->expects($this->at(7))
             ->method('gets')
             ->with($this->equalTo('#resource'))
             ->will($this->returnValue("$4\r\n"));
 
-        $mock->expects($this->any(8))
+        $mock->expects($this->at(8))
             ->method('read')
             ->with($this->equalTo('#resource'))
             ->will($this->returnValue("data"));
@@ -225,4 +225,55 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \Irediscent\Exception\TransmissionException
+     */
+    public function testTransmissionErrorReadThrows()
+    {
+        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+
+        $mock->expects($this->once())
+            ->method('write')
+            ->will($this->returnValue(14));
+
+        $mock->expects($this->once())
+            ->method('gets')
+            ->will($this->returnValue("$4\n\r"));
+
+        $mock->expects($this->once())
+            ->method('read')
+            ->will($this->returnValue(false));
+
+        $obj = new Irediscent\Connection\SocketConnection();
+
+        $obj->setSocketObject($mock);
+
+        $obj->write(array(
+            'data'
+        ));
+    }
+
+    /**
+     * @expectedException \Irediscent\Exception\UnknownResponseException
+     */
+    public function testUknownResponseErrorThrows()
+    {
+        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+
+        $mock->expects($this->once())
+            ->method('write')
+            ->will($this->returnValue(14));
+
+        $mock->expects($this->once())
+            ->method('gets')
+            ->will($this->returnValue("%"));
+
+        $obj = new Irediscent\Connection\SocketConnection();
+
+        $obj->setSocketObject($mock);
+
+        $obj->write(array(
+            'data'
+        ));
+    }
 }
