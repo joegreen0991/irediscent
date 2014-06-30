@@ -6,7 +6,7 @@ class IRedis extends ConnectionAbstract {
     {
         $connection = $this->dsn->getMasterDsn();
 
-        $this->redis = $this->redis = phpiredis_connect($connection['host'], $connection['port']);
+        $this->redis = phpiredis_connect($connection['host'], $connection['port']);
 
         if ($this->redis === false)
         {
