@@ -27,11 +27,9 @@ class SocketConnection extends ConnectionAbstract {
 
     public function connect()
     {
-        $timeout = $this->timeout ?: ini_get("default_socket_timeout");
-
         $connection = $this->dsn->getMasterDsn();
 
-        $this->redis = $this->socket->open($connection['host'], $connection['port'], $errno, $errstr, $timeout);
+        $this->redis = $this->socket->open($connection['host'], $connection['port'], $errno, $errstr, $this->timeout);
 
         if ($this->redis === false)
         {
@@ -87,7 +85,7 @@ class SocketConnection extends ConnectionAbstract {
         {
             $fwrite = $this->socket->write($this->redis, substr($command, $written));
 
-            if ($fwrite === FALSE || $fwrite <= 0)
+            if ($fwrite === false || $fwrite <= 0)
             {
                 throw new TransmissionException('Failed to write entire command to stream');
             }
@@ -105,9 +103,6 @@ class SocketConnection extends ConnectionAbstract {
             /* Inline reply */
             case '+':
                 $response = substr(trim($reply), 1);
-                if ($response === 'OK') {
-                    $response = TRUE;
-                }
                 break;
             /* Bulk reply */
             case '$':

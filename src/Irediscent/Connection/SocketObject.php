@@ -5,14 +5,14 @@
  */
 class SocketObject
 {
-    public function open($host, $port, &$errno, &$errstr, $timeout)
+    public function open($host, $port = null, &$errno = null, &$errstr = null, $timeout = null)
     {
-        return @fsockopen($host, $port, $errno, $errstr, $timeout);
+        return @fsockopen($host, $port, $errno, $errstr, $timeout ?: ini_get("default_socket_timeout"));
     }
 
-    public function write($handle, $data, $length = null)
+    public function write($handle, $data)
     {
-        return fwrite($handle, $data, $length);
+        return fwrite($handle, $data);
     }
 
     public function read($handle, $length)

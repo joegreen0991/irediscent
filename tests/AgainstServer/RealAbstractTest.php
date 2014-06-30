@@ -5,6 +5,22 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
     protected $r;
 
+
+    function testSet() {
+        $this->assertEquals('OK', $this->r->set('foo', 'bar'));
+        $this->assertEquals($this->r->get('foo'), 'bar');
+    }
+
+    function testExists() {
+        $this->assertEquals($this->r->exists('foo'), 1);
+        $this->assertEquals($this->r->exists('bar'), 0);
+    }
+
+    function testDel() {
+        $this->assertEquals($this->r->del('foo'), 1);
+        $this->assertNull($this->r->get('foo'));
+    }
+
     function testFluentIncr() {
         // Test the fluent interface
         $responses = $this->r->pipeline()

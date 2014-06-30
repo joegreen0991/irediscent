@@ -79,7 +79,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             'DEL','key','data'
         ));
 
-        $this->assertEquals(1, $res);
+        $this->assertEquals('OK', $res);
 
         $resArray = $obj->multiWrite(array(
             array('SET','key','data'),
