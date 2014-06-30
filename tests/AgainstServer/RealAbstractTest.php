@@ -6,12 +6,23 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
     protected $r;
 
 
-    function testSet() {
+    function testSet()
+    {
         $this->assertEquals('OK', $this->r->set('foo', 'bar'));
         $this->assertEquals($this->r->get('foo'), 'bar');
+
+        $this->r->disconnect();
     }
 
-    function testExists() {
+    function testHset()
+    {
+        $this->r->hmset('test', 'one', 1, 'two', 2);
+
+        $this->assertEquals(array('one', 1, 'two', 2), $this->r->hgetall('test'));
+    }
+
+    function testExists()
+    {
         $this->assertEquals($this->r->exists('foo'), 1);
         $this->assertEquals($this->r->exists('bar'), 0);
     }
