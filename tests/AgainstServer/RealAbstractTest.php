@@ -67,12 +67,12 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Irediscent\Exception\RedisException
      * @expectedMessage unknown command 'UNKNOWNCOMMAND'
-     */
+
     function testItThrowsRedisServerException() {
 
-        //$this->r->unknownCommand();
+        $this->r->unknownCommand();
 
-    }
+    }*/
 
     /**
      * @expectedException Irediscent\Exception\ConnectionException
