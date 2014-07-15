@@ -7,8 +7,8 @@ include_once 'RealAbstractTest.php';
 
 class RealSocketTest extends RealAbstractTest
 {
-    function setUp()
+    protected function getConnection($conn = null)
     {
-        $this->r = new Irediscent(new SocketConnection());
+        return new Irediscent(new SocketConnection($conn));
     }
 }

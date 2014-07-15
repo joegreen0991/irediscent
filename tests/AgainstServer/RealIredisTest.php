@@ -15,7 +15,13 @@ class RealIredisTest extends RealAbstractTest
                 'PHPIRedis library is not implemented'
             );
         }
+        else {
+            parent::setUp();
+        }
+    }
 
-        $this->r = new Irediscent(new IRedis());
+    protected function getConnection($conn = null)
+    {
+        return new Irediscent(new IRedis($conn));
     }
 }
