@@ -1,5 +1,6 @@
 <?php namespace Irediscent\Connection;
 
+use Irediscent\Connection\Util\SocketObject;
 use Irediscent\Exception\ConnectionException;
 use Irediscent\Exception\TransmissionException;
 use Irediscent\Exception\RedisException;

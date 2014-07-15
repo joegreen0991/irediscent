@@ -1,4 +1,4 @@
-<?php namespace Irediscent\Connection;
+<?php namespace Irediscent\Connection\Util;
 
 /**
  * @codeCoverageIgnore

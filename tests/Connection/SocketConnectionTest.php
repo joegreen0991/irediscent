@@ -5,9 +5,9 @@ use Irediscent;
 class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testObject()
+    public function testItCorrectlySerializesTheCommandsToRedisProtocol()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
              ->method('open')
@@ -96,9 +96,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testReConnect()
+    public function testItReConnectsWhenAsked()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->at(0))
             ->method('open')
@@ -129,9 +129,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj->isConnected());
     }
 
-    public function testAutoConnect()
+    public function testItAutoConnectsWhenFirstCommandIsPerformed()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->at(0))
             ->method('open')
@@ -162,9 +162,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Irediscent\Exception\RedisException
      * @expectedMessage This is an error
      */
-    public function testRedisError()
+    public function testItThrowsRedisExceptionOnServerError()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
             ->method('write')
@@ -186,9 +186,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Irediscent\Exception\ConnectionException
      */
-    public function testConnectionErrorThrows()
+    public function testItThrowsConnectionExceptionWhenServerConnectionOpenFails()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
              ->method('open')
@@ -205,9 +205,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Irediscent\Exception\TransmissionException
      */
-    public function testTransmissionErrorThrows()
+    public function testItThrowsTransmissionErrorWhenNoDataIsReturnedFromWrite()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
             ->method('open')
@@ -228,9 +228,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Irediscent\Exception\TransmissionException
      */
-    public function testTransmissionErrorReadThrows()
+    public function testItThrowsTransmissionExceptionWhenNoDataIsReturnedFromRead()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
             ->method('write')
@@ -256,9 +256,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Irediscent\Exception\UnknownResponseException
      */
-    public function testUknownResponseErrorThrows()
+    public function testItThrowsUnknownResponseException()
     {
-        $mock = $this->getMock('Irediscent\Connection\SocketObject');
+        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
             ->method('write')

@@ -16,7 +16,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         return array(new Irediscent($connection), $connection);
     }
 
-    public function testObjectConnectsWithPasswordAndPassword()
+    public function testItConnectsWithPasswordAndPassword()
     {
         $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
@@ -40,7 +40,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    public function testRawExecute()
+    public function testItExecutesARawQuery()
     {
         $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
@@ -66,7 +66,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         $db->execute('GET', array('key2', 2));
     }
 
-    public function testPipeline()
+    public function testItExecutesAPipelinedCommand()
     {
         list($redis, $connection) = $this->getObjectAndMock();
 
@@ -92,7 +92,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         ), $res);
     }
 
-    public function testPipelineUncork()
+    public function testItCorrectlyUncorksNonFluentPipelineCommands()
     {
         list($redis, $connection) = $this->getObjectAndMock();
 
@@ -121,7 +121,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         ), $res);
     }
 
-    public function testMultiExec()
+    public function testItPerformsAMultiExecCommand()
     {
         list($redis, $connection) = $this->getObjectAndMock();
 
@@ -149,7 +149,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         ), $res);
     }
 
-    public function testConnectionDisconnection()
+    public function testItDisconnects()
     {
         list($redis, $connection) = $this->getObjectAndMock();
 

@@ -5,11 +5,11 @@ use Irediscent;
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testObject()
+    public function testObjectIsCreatedCorrectly()
     {
-        $obj = new Irediscent\Connection\Factory();
+        $connectionFactory = new Irediscent\Connection\Factory();
 
-        $instance = $obj->getInstance();
+        $instance = $connectionFactory->getInstance();
 
         $this->assertInstanceOf('Irediscent\Connection\ConnectionInterface', $instance);
     }

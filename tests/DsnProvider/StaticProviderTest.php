@@ -5,7 +5,7 @@ use Irediscent;
 class StaticProviderTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testObject()
+    public function testItReturnsMasterAndSlaveDsnData()
     {
         $return = array(
             'host' => '1.0.0.1',
@@ -42,7 +42,7 @@ class StaticProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($returnSlavesExp, $got);
     }
 
-    public function testObjectMasterEmpty()
+    public function testItResolvesAnEmptyConfigToDefaultDsn()
     {
         $return = array(
             ''
@@ -57,8 +57,8 @@ class StaticProviderTest extends \PHPUnit_Framework_TestCase
             'port' => 6379,
         ), $got);
     }
-
-    public function testGetSlaves()
+/*
+    public function testItReturnsTheConfiguredSlavesDsn()
     {
         $return = array(
             array(
@@ -111,9 +111,9 @@ class StaticProviderTest extends \PHPUnit_Framework_TestCase
                 'port' => 26
             )
         ), $got);
-    }
-
-    public function testObjectFailsCorrectly()
+    }*/
+/*
+    public function testItFailsCorrectlyWhenASentinelCannotBeReached()
     {
         $mock1 = $this->getMock('Irediscent\Connection\ConnectionInterface');
         $mock2 = $this->getMock('Irediscent\Connection\ConnectionInterface');
@@ -151,11 +151,12 @@ class StaticProviderTest extends \PHPUnit_Framework_TestCase
         $obj->getMasterDsn();
 
     }
-
+*/
     /**
      * @expectedException Irediscent\Exception\NoSentinelsException
      */
-    public function testObjectThrowsExceptionCorrectly()
+    /*
+    public function testItThrowsNoSentinelsExceptionWhenNoSentinelsCanBeReached()
     {
         $mock1 = $this->getMock('Irediscent\Connection\ConnectionInterface');
         $mock2 = $this->getMock('Irediscent\Connection\ConnectionInterface');
@@ -178,5 +179,5 @@ class StaticProviderTest extends \PHPUnit_Framework_TestCase
         $obj->getMasterDsn();
 
     }
-
+*/
 }

@@ -5,7 +5,7 @@ use Irediscent;
 class SentinelProviderTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testObject()
+    public function testItReturnsTheConfiguredMasterDsn()
     {
         $return = array(
             'host' => '1.0.0.1',
@@ -37,7 +37,7 @@ class SentinelProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($return, $got);
     }
 
-    public function testGetSlaves()
+    public function testItReturnsTheConfiguredSlavesDsn()
     {
         $return = array(
             array(
@@ -92,7 +92,7 @@ class SentinelProviderTest extends \PHPUnit_Framework_TestCase
         ), $got);
     }
 
-    public function testObjectFailsCorrectly()
+    public function testItFailsCorrectlyWhenASentinelCannotBeReached()
     {
         $mock1 = $this->getMock('Irediscent\Connection\ConnectionInterface');
         $mock2 = $this->getMock('Irediscent\Connection\ConnectionInterface');
@@ -134,7 +134,7 @@ class SentinelProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Irediscent\Exception\NoSentinelsException
      */
-    public function testObjectThrowsExceptionCorrectly()
+    public function testItThrowsNoSentinelsExceptionWhenNoSentinelsCanBeReached()
     {
         $mock1 = $this->getMock('Irediscent\Connection\ConnectionInterface');
         $mock2 = $this->getMock('Irediscent\Connection\ConnectionInterface');
