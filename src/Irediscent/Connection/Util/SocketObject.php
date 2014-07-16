@@ -20,9 +20,9 @@ class SocketObject
         return fread($handle, $length);
     }
 
-    public function gets($handle, $length = null)
+    public function gets($handle)
     {
-        return fgets($handle, $length);
+        return fgets($handle);
     }
 
     public function close($handle)
