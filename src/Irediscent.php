@@ -64,6 +64,8 @@ class Irediscent {
         {
             $this->select($this->options['database']);
         }
+
+        return $this;
     }
 
     /**
@@ -72,6 +74,16 @@ class Irediscent {
     public function disconnect()
     {
         $this->connection->disconnect();
+
+        return $this;
+    }
+
+    /**
+     * Disconnect and reconnect to the database
+     */
+    public function reconnect()
+    {
+        return $this->disconnect()->connect();
     }
 
     /**
