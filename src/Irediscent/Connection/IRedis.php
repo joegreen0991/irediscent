@@ -1,33 +1,32 @@
 <?php namespace Irediscent\Connection;
 
 use Irediscent\Connection\Util\IRedisObject;
-use Irediscent\Connection\Util\IRedisProxy;
 use Irediscent\Exception\ConnectionException;
 
 class IRedis extends ConnectionAbstract {
 
     /**
-     * @var IRedisProxy
+     * @var IRedisObject
      */
-    private $iredisProxy;
+    private $iredisObject;
 
     public function __construct($dsn = null)
     {
         parent::__construct($dsn);
 
-        $this->iredisProxy = new IRedisObject();
+        $this->iredisObject = new IRedisObject();
     }
 
     public function setIredisObject(IRedisObject $proxy)
     {
-        $this->iredisProxy = $proxy;
+        $this->iredisObject = $proxy;
     }
 
     public function connect()
     {
         $connection = $this->dsn->getMasterDsn();
 
-        $this->redis = $this->iredisProxy->connect($connection['host'], $connection['port']);
+        $this->redis = $this->iredisObject->connect($connection['host'], $connection['port']);
 
         if ($this->redis === false)
         {
@@ -37,7 +36,7 @@ class IRedis extends ConnectionAbstract {
 
     public function disconnect()
     {
-        $this->iredisProxy->disconnect($this->redis);
+        $this->iredisObject->disconnect($this->redis);
 
         $this->redis = null;
     }
@@ -48,13 +47,13 @@ class IRedis extends ConnectionAbstract {
 
         // `strval` map handles an issue affecting 'phpiredis_command_bs' where params must be strings.
         // This issue does not affect `phpiredis_multi_command_bs`
-        return $this->iredisProxy->command($this->redis, array_map('strval', $data));
+        return $this->iredisObject->command($this->redis, array_map('strval', $data));
     }
 
     public function multiWrite($data)
     {
         $this->safeConnect();
 
-        return $this->iredisProxy->multiCommand($this->redis, $data);
+        return $this->iredisObject->multiCommand($this->redis, $data);
     }
 }
