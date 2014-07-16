@@ -33,10 +33,9 @@ class Irediscent {
     );
 
     /**
-     * Creates a Redisent connection to the Redis server at the address specified by {@link $dsn}.
-     * The default connection is to the server running on localhost on port 6379.
-     * @param string $dsn The data source name of the Redis server
-     * @param float $timeout The connection timeout in seconds
+     * @param string|ConnectionInterface $connection The data source name of the Redis server
+     * @param string $password
+     * @param array $options
      */
     public function __construct($connection = null, $password = null, array $options = array())
     {
