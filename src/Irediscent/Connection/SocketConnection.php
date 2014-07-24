@@ -128,19 +128,22 @@ class SocketConnection extends ConnectionAbstract {
                 }
                 $response = '';
                 $read = 0;
-
-                do {
-                    $chunk = $this->socket->read($this->redis, min($size - $read, 4096));
-
-                    if ($chunk === false || $chunk === '')
-                    {
-                        throw new TransmissionException('Failed to read response from stream');
-                    }
-
-                    $read += strlen($chunk);
-                    $response .= $chunk;
-
-                } while ($read < $size);
+                
+                if($size)
+                {
+                    do {
+                        $chunk = $this->socket->read($this->redis, min($size - $read, 4096));
+    
+                        if ($chunk === false || $chunk === '')
+                        {
+                            throw new TransmissionException('Failed to read response from stream');
+                        }
+    
+                        $read += strlen($chunk);
+                        $response .= $chunk;
+    
+                    } while ($read < $size);
+                }
 
                 $this->socket->read($this->redis, 2);
 
