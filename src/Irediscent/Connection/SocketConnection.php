@@ -122,33 +122,27 @@ class SocketConnection extends ConnectionAbstract {
                 }
                 return $response;
             case '$':
-
-                if (($size = (int) $payload) === -1) {
+                $size = (int) $payload;
+                if ($size === -1) {
                     return null;
                 }
-                $response = '';
-                $read = 0;
-                
-                if($size)
-                {
-                    do {
-                        $chunk = $this->socket->read($this->redis, min($size - $read, 4096));
-    
-                        if ($chunk === false || $chunk === '')
-                        {
-                            throw new TransmissionException('Failed to read response from stream');
-                        }
-    
-                        $read += strlen($chunk);
-                        $response .= $chunk;
-    
-                    } while ($read < $size);
-                    
-                    $this->socket->read($this->redis, 2);
-                }
-                
-                return $response;
 
+                $response = '';
+                $bytesLeft = ($size += 2);
+
+                do {
+                    $chunk = fread($this->redis, min($bytesLeft, 4096));
+
+                    if ($chunk === false || $chunk === '')
+                    {
+                        throw new TransmissionException('Failed to read response from stream');
+                    }
+
+                    $response .= $chunk;
+                    $bytesLeft = $size - strlen($response);
+                } while ($bytesLeft > 0);
+
+                return substr($response, 0, -2);
             default:
                 throw new UnknownResponseException("Unknown response: $prefix");
         }
