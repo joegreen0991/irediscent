@@ -143,10 +143,10 @@ class SocketConnection extends ConnectionAbstract {
                         $response .= $chunk;
     
                     } while ($read < $size);
+                    
+                    $this->socket->read($this->redis, 2);
                 }
-
-                $this->socket->read($this->redis, 2);
-
+                
                 return $response;
 
             default:
