@@ -16,6 +16,11 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         return array(new Irediscent($connection), $connection);
     }
 
+    public function testItConnectsToServerWithFactory()
+    {
+        new Irediscent();
+    }
+
     public function testItConnectsWithPasswordAndPassword()
     {
         $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');

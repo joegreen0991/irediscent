@@ -39,11 +39,11 @@ class Irediscent {
      */
     public function __construct($connection = null, $password = null, array $options = array())
     {
-        $this->connection = $connection instanceof ConnectionInterface ? $connection : Factory::make($connection);
+        $this->options = $options + $this->defaultOptions;
+
+        $this->connection = $connection instanceof ConnectionInterface ? $connection : Factory::make($connection, $this->options['timeout']);
 
         $this->password = $password;
-
-        $this->options = $options + $this->defaultOptions;
 
         $this->connect();
     }
