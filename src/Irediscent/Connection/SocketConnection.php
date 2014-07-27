@@ -1,10 +1,9 @@
 <?php namespace Irediscent\Connection;
 
+use Irediscent\Connection\Serializer\SerializerInterface;
 use Irediscent\Connection\Util\SocketObject;
 use Irediscent\Exception\ConnectionException;
 use Irediscent\Exception\TransmissionException;
-use Irediscent\Exception\RedisException;
-use Irediscent\Exception\UnknownResponseException;
 
 class SocketConnection extends ConnectionAbstract {
 
@@ -12,9 +11,13 @@ class SocketConnection extends ConnectionAbstract {
 
     protected $socket;
 
-    public function __construct($dsn = null, $timeout = null)
+    protected $serializer;
+
+    public function __construct(SerializerInterface $serializer, $dsn = null, $timeout = null)
     {
         $this->timeout = $timeout;
+
+        $this->serializer = $serializer;
 
         $this->socket = new SocketObject();
 
@@ -76,11 +79,7 @@ class SocketConnection extends ConnectionAbstract {
 
     private function writeRaw($data)
     {
-        $crlf = "\r\n";
-        $command = '*' . count($data) . $crlf;
-        foreach ($data as $arg) {
-            $command .= '$' . strlen($arg) . $crlf . $arg . $crlf;
-        }
+        $command = $this->serializer->serialize($data);
 
         for ($written = 0; $written < strlen($command); $written += $fwrite)
         {
@@ -95,56 +94,16 @@ class SocketConnection extends ConnectionAbstract {
 
     private function readResponse()
     {
-        $chunk  = $this->socket->gets($this->redis);
+        do {
+            $chunk = $this->socket->gets($this->redis);
 
-        if ($chunk === false || $chunk === '') {
-            throw new TransmissionException('Failed to read response from stream');
-        }
+            if ($chunk === false || $chunk === '' || $chunk === null)
+            {
+                throw new TransmissionException('Failed to read response from stream');
+            }
 
-        $prefix  = $chunk[0];
-        $payload = substr($chunk, 1, -2);
+        }while(($result = $this->serializer->read($chunk)) === false);
 
-        switch ($prefix) {
-            case '-':
-                throw new RedisException($payload);
-            case ':':
-                return (int) $payload;
-            case '+':
-                return $payload;
-            case '*':
-                $count = (int) $payload;
-                if ($count === -1) {
-                    return NULL;
-                }
-                $response = array();
-                for ($i = 0; $i < $count; $i++) {
-                    $response[] = $this->readResponse();
-                }
-                return $response;
-            case '$':
-                $size = (int) $payload;
-                if ($size === -1) {
-                    return null;
-                }
-
-                $response = '';
-                $bytesLeft = ($size += 2);
-
-                do {
-                    $chunk = fread($this->redis, min($bytesLeft, 4096));
-
-                    if ($chunk === false || $chunk === '')
-                    {
-                        throw new TransmissionException('Failed to read response from stream');
-                    }
-
-                    $response .= $chunk;
-                    $bytesLeft = $size - strlen($response);
-                } while ($bytesLeft > 0);
-
-                return substr($response, 0, -2);
-            default:
-                throw new UnknownResponseException("Unknown response: $prefix");
-        }
+        return $result;
     }
 }

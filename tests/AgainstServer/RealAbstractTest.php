@@ -14,7 +14,7 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
     function testItSetsAndGetsData()
     {
-        $this->assertEquals('OK', $this->r->set('foo', 'bar'));
+        $this->assertEquals(true, $this->r->set('foo', 'bar'));
         $this->assertEquals($this->r->get('foo'), 'bar');
 
         $this->r->disconnect();
@@ -66,17 +66,17 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Irediscent\Exception\RedisException
-     * @expectedMessage unknown command 'UNKNOWNCOMMAND'
+     * @expectedExceptionMessage ERR unknown command 'UNKNOWNCOMMAND'
+     */
+    function testItThrowsRedisServerException()
+    {
+        $output = $this->r->unknownCommand();
 
-    function testItThrowsRedisServerException() {
-
-        $this->r->unknownCommand();
-
-    }*/
+        echo $output;
+    }
 
     /**
      * @expectedException Irediscent\Exception\ConnectionException
-     * @expectedMessage unknown command 'UNKNOWNCOMMAND'
      */
     function testItThrowsConnectionException() {
 

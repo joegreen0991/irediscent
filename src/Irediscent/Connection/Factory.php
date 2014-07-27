@@ -1,5 +1,8 @@
 <?php namespace Irediscent\Connection;
 
+use Irediscent\Connection\Serializer\IRedis;
+use Irediscent\Connection\Serializer\PurePhp;
+
 class Factory {
 
     protected $dsn;
@@ -8,7 +11,7 @@ class Factory {
 
     /**
      * @param null $dsn
-     * @param null $timeout Timeout is for streamconnection only
+     * @param null $timeout Socket connection timeout
      */
     public function __construct($dsn = null, $timeout = null)
     {
@@ -31,9 +34,12 @@ class Factory {
     {
         if(function_exists('phpiredis_connect'))
         {
-            return new IRedis($dsn);
+            $serializer = new IRedis();
+        }
+        else{
+            $serializer = new PurePhp();
         }
 
-        return new SocketConnection($dsn, $timeout);
+        return new SocketConnection($serializer, $dsn, $timeout);
     }
 }

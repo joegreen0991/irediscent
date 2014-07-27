@@ -5,67 +5,60 @@ use Irediscent;
 class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testItCorrectlySerializesTheCommandsToRedisProtocol()
+    public function testItCorrectlySendsCommandsToTheSerializer()
     {
+
         $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
 
         $mock->expects($this->once())
              ->method('open')
              ->will($this->returnValue('#resource'));
 
-        // Test a simple single write which fails to write the full set of data first time
-        $mock->expects($this->at(1))
+        $mock->expects($this->any())
             ->method('write')
-            ->with($this->equalTo('#resource'), $this->equalTo("*3\r\n$3\r\nDEL\r\n$3\r\nkey\r\n$4\r\ndata\r\n"))
-            ->will($this->returnValue(5)); // only writes 5 bytes
+            ->will($this->returnValue(1));
 
-        // So tries again with the remaining 27 bytes
-        $mock->expects($this->at(2))
-            ->method('write')
-            ->with($this->equalTo('#resource'), $this->equalTo("3\r\nDEL\r\n$3\r\nkey\r\n$4\r\ndata\r\n"))
-            ->will($this->returnValue(27));
-
-        // Returns an integer response
-        $mock->expects($this->at(3))
+        $mock->expects($this->any())
             ->method('gets')
-            ->with($this->equalTo('#resource'))
-            ->will($this->returnValue("+OK\r\n"));
-
-
-
-        // Try a multi write with one inline response and one bulk response
-        $mock->expects($this->at(4))
-            ->method('write')
-            ->with($this->equalTo('#resource'), $this->equalTo("*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$4\r\ndata\r\n"))
-            ->will($this->returnValue(32));
-
-        $mock->expects($this->at(5))
-            ->method('write')
-            ->with($this->equalTo('#resource'), $this->equalTo("*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n"))
-            ->will($this->returnValue(22));
-
-        $mock->expects($this->at(6))
-            ->method('gets')
-            ->with($this->equalTo('#resource'))
-            ->will($this->returnValue(":1\r\n"));
-
-        $mock->expects($this->at(7))
-            ->method('gets')
-            ->with($this->equalTo('#resource'))
-            ->will($this->returnValue("$4\r\n"));
-
-        $mock->expects($this->at(8))
-            ->method('read')
-            ->with($this->equalTo('#resource'))
-            ->will($this->returnValue("data"));
-
+            ->will($this->returnValue(1));
 
         // Close the connection
         $mock->expects($this->once())
             ->method('close')
             ->with($this->equalTo('#resource'));
 
-        $obj = new Irediscent\Connection\SocketConnection();
+        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
+
+        $mockSerializer->expects($this->at(0))
+            ->method('serialize')
+            ->with(array(
+                'DEL','key','data'
+            ));
+
+        $mockSerializer->expects($this->at(1))
+            ->method('read')
+            ->will($this->returnValue(true));
+
+        $mockSerializer->expects($this->at(2))
+            ->method('serialize')
+            ->with(array('SET','key','data'));
+
+        $mockSerializer->expects($this->at(3))
+            ->method('serialize')
+            ->with(array('GET','key'));
+
+        $mockSerializer->expects($this->at(4))
+            ->method('read')
+            ->will($this->returnValue(
+                1
+            ));
+        $mockSerializer->expects($this->at(5))
+            ->method('read')
+            ->will($this->returnValue(
+                'data'
+            ));
+
+        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -79,7 +72,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             'DEL','key','data'
         ));
 
-        $this->assertEquals('OK', $res);
+        $this->assertEquals(true, $res);
 
         $resArray = $obj->multiWrite(array(
             array('SET','key','data'),
@@ -114,7 +107,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('open')
             ->will($this->returnValue('#resource'));
 
-        $obj = new Irediscent\Connection\SocketConnection();
+        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
+
+        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -137,15 +132,13 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('open')
             ->will($this->returnValue('#resource'));
 
-        $mock->expects($this->once())
-            ->method('write')
-            ->will($this->returnValue(14));
-
-        $mock->expects($this->once())
+        $mock->expects($this->any())
             ->method('gets')
-            ->will($this->returnValue(':1'));
+            ->will($this->returnValue(1));
 
-        $obj = new Irediscent\Connection\SocketConnection();
+        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
+
+        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -156,31 +149,6 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertTrue($obj->isConnected());
-    }
-
-    /**
-     * @expectedException \Irediscent\Exception\RedisException
-     * @expectedMessage This is an error
-     */
-    public function testItThrowsRedisExceptionOnServerError()
-    {
-        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
-
-        $mock->expects($this->once())
-            ->method('write')
-            ->will($this->returnValue(14));
-
-        $mock->expects($this->once())
-            ->method('gets')
-            ->will($this->returnValue('-This is an error'));
-
-        $obj = new Irediscent\Connection\SocketConnection();
-
-        $obj->setSocketObject($mock);
-
-        $obj->write(array(
-            'data'
-        ));
     }
 
     /**
@@ -195,7 +163,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
              ->will($this->returnValue(false));
 
 
-        $obj = new Irediscent\Connection\SocketConnection();
+        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
+
+        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -214,7 +184,9 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
 
-        $obj = new Irediscent\Connection\SocketConnection();
+        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
+
+        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -236,39 +208,20 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('write')
             ->will($this->returnValue(14));
 
-        $mock->expects($this->once())
+        $mock->expects($this->at(1))
             ->method('gets')
-            ->will($this->returnValue("$4\n\r"));
-
-        $mock->expects($this->once())
-            ->method('read')
             ->will($this->returnValue(false));
 
-        $obj = new Irediscent\Connection\SocketConnection();
+        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
 
-        $obj->setSocketObject($mock);
+        $mockSerializer->expects($this->at(0))
+            ->method('serialize')
+            ->with(array(
+                'data'
+            ))
+            ->will($this->returnValue("data"));
 
-        $obj->write(array(
-            'data'
-        ));
-    }
-
-    /**
-     * @expectedException \Irediscent\Exception\UnknownResponseException
-     */
-    public function testItThrowsUnknownResponseException()
-    {
-        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
-
-        $mock->expects($this->once())
-            ->method('write')
-            ->will($this->returnValue(14));
-
-        $mock->expects($this->once())
-            ->method('gets')
-            ->will($this->returnValue("%"));
-
-        $obj = new Irediscent\Connection\SocketConnection();
+        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
 
         $obj->setSocketObject($mock);
 

@@ -1,9 +1,10 @@
 <?php namespace tests\Irediscent;
 
-use Irediscent\Connection\IRedis;
+use Irediscent\Connection\SocketConnection;
+use Irediscent\Connection\Serializer\IRedis;
 use Irediscent;
 
-class RealIredisTest extends RealAbstractTest
+class RealIredisSerializerTest extends RealAbstractTest
 {
 
     function setUp()
@@ -22,6 +23,6 @@ class RealIredisTest extends RealAbstractTest
 
     protected function getConnection($conn = null)
     {
-        return new Irediscent(new IRedis($conn));
+        return new Irediscent(new SocketConnection(new IRedis(), $conn, null));
     }
 }
