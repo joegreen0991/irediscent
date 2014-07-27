@@ -7,11 +7,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testObjectIsCreatedCorrectly()
     {
-        $connectionFactory = new Irediscent\Connection\Factory();
+        $instance = Irediscent\Connection\Serializer\Factory::make();
 
-        $instance = $connectionFactory->getInstance();
-
-        $this->assertInstanceOf('Irediscent\Connection\ConnectionInterface', $instance);
+        $this->assertInstanceOf('Irediscent\Connection\Serializer\SerializerInterface', $instance);
     }
 
 }

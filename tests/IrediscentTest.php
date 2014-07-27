@@ -40,9 +40,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo(array('SELECT', 4)));
 
 
-        new Irediscent($connection, 'password', array(
-            'database' => 4
-        ));
+        new Irediscent($connection, 'password', 4);
     }
 
     public function testItExecutesARawQuery()

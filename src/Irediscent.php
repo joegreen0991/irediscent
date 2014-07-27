@@ -1,7 +1,6 @@
 <?php
 use Irediscent\Connection\ConnectionInterface;
-use Irediscent\Connection\Factory;
-
+use Irediscent\Connection\SocketConnection;
 
 class Irediscent {
 
@@ -24,26 +23,22 @@ class Irediscent {
      */
     private $queue = array();
 
-    /**
-     * @var array
-     */
-    private $defaultOptions = array(
-        'database' => 0,
-        'timeout' => 5
-    );
+    private $password;
+
+    private $database;
 
     /**
      * @param string|ConnectionInterface $connection The data source name of the Redis server
      * @param string $password
      * @param array $options
      */
-    public function __construct($connection = null, $password = null, array $options = array())
+    public function __construct($connection = null, $password = null, $database = null)
     {
-        $this->options = $options + $this->defaultOptions;
-
-        $this->connection = $connection instanceof ConnectionInterface ? $connection : Factory::make($connection, $this->options['timeout']);
+        $this->connection = $connection instanceof ConnectionInterface ? $connection : new SocketConnection($connection);
 
         $this->password = $password;
+
+        $this->database = $database;
 
         $this->connect();
     }
@@ -60,9 +55,9 @@ class Irediscent {
             $this->auth($this->password);
         }
 
-        if($this->options['database'])
+        if($this->database)
         {
-            $this->select($this->options['database']);
+            $this->select($this->database);
         }
 
         return $this;

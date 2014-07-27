@@ -1,5 +1,6 @@
 <?php namespace Irediscent\Connection;
 
+use Irediscent\Connection\Serializer\Factory;
 use Irediscent\Connection\Serializer\SerializerInterface;
 use Irediscent\Connection\Util\SocketObject;
 use Irediscent\Exception\ConnectionException;
@@ -7,17 +8,20 @@ use Irediscent\Exception\TransmissionException;
 
 class SocketConnection extends ConnectionAbstract {
 
+    /**
+     * @var SerializerInterface
+     */
+    protected $serializer;
+
     protected $timeout;
 
     protected $socket;
 
-    protected $serializer;
-
-    public function __construct(SerializerInterface $serializer, $dsn = null, $timeout = null)
+    public function __construct($dsn = null, SerializerInterface $serializer = null, $timeout = null)
     {
         $this->timeout = $timeout;
 
-        $this->serializer = $serializer;
+        $this->serializer = $serializer ?: Factory::make();
 
         $this->socket = new SocketObject();
 

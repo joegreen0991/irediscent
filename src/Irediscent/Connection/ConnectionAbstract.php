@@ -1,5 +1,6 @@
 <?php namespace Irediscent\Connection;
 
+use Irediscent\Connection\Serializer\SerializerInterface;
 use Irediscent\DsnProvider\DsnProviderInterface;
 use Irediscent\DsnProvider\StaticProvider;
 
@@ -16,6 +17,7 @@ abstract class ConnectionAbstract implements ConnectionInterface {
      * @var \Irediscent\DsnProvider\DsnProviderInterface
      */
     protected $dsn;
+
 
     public function __construct($dsn = null)
     {

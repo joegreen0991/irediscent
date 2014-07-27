@@ -58,7 +58,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
                 'data'
             ));
 
-        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -109,7 +109,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 
         $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
 
-        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -138,7 +138,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 
         $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
 
-        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -165,7 +165,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 
         $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
 
-        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -186,7 +186,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 
         $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
 
-        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
 
         $obj->setSocketObject($mock);
 
@@ -221,7 +221,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ))
             ->will($this->returnValue("data"));
 
-        $obj = new Irediscent\Connection\SocketConnection($mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
 
         $obj->setSocketObject($mock);
 
