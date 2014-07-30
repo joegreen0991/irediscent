@@ -79,4 +79,51 @@ class PurePhpTest extends \PHPUnit_Framework_TestCase
             array(["*4\r\n:1\r\n+OK\r\n*2\r","\n$3","\r\nASD\r\n$-1\r\n$2\r\nTT\r\n"], array(1, true, array("ASD", null), "TT"), false),
         );
     }
+
+    /***
+     * @param type $buffer
+     * @param type $expectedData
+     * @param type $expectedError
+     */
+    public function testReadAfterErrorWorks()
+    {
+        $parser = new Irediscent\Connection\Serializer\PurePhp();
+
+        try{
+            $parser->read("*2\r\n");
+            $parser->read("$5\r\n");
+            $parser->read("hello\r\n");
+            $parser->read("@foo\r\n");
+        }
+        catch(Irediscent\Exception $e)
+        {
+
+        }
+
+        $response = $parser->read(":123\r\n");
+
+        $this->assertEquals(123,$response);
+    }
+
+    /***
+     * @param type $buffer
+     * @param type $expectedData
+     * @param type $expectedError
+     */
+    public function testReadAfterNoScriptWorks()
+    {
+        $parser = new Irediscent\Connection\Serializer\PurePhp();
+
+        try{
+            $parser->read("-NOSCRIPT use eval\r\n");
+        }
+        catch(Irediscent\Exception $e)
+        {
+
+        }
+
+        $response = $parser->read(":123\r\n");
+
+        $this->assertEquals(123,$response);
+    }
 }
