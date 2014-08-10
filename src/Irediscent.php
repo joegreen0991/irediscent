@@ -11,20 +11,26 @@ class Irediscent {
 
     /**
      * Flag indicating whether or not commands are being pipelined
-     * @var boolean
-     * @access private
+     * @var bool
      */
     private $pipelined = false;
 
     /**
-     * The queue of commands to be sent to the Redis server
+     * The queue of commands to be sent to the Redis server when pipelining
      * @var array
-     * @access private
      */
     private $queue = array();
 
+    /**
+     * The password to authenticate with on connection
+     * @var null|string
+     */
     private $password;
 
+    /**
+     * The Database index to select on connection
+     * @var null|int
+     */
     private $database;
 
     /**
@@ -44,7 +50,8 @@ class Irediscent {
     }
 
     /**
-     * Connect to the database
+     * Connect to the redis server
+     * @return $this
      */
     public function connect()
     {
@@ -64,7 +71,8 @@ class Irediscent {
     }
 
     /**
-     * Disconnect from the database
+     * Disconnect from the redis server
+     * @return $this
      */
     public function disconnect()
     {
@@ -74,7 +82,8 @@ class Irediscent {
     }
 
     /**
-     * Disconnect and reconnect to the database
+     * Drop the connection to the server and recreate
+     * @return $this
      */
     public function reconnect()
     {
@@ -82,10 +91,13 @@ class Irediscent {
     }
 
     /**
-     * Returns the Redisent instance ready for pipelining.
-     * Redis commands can now be chained, and the array of the responses will be returned when {@link uncork} is called.
-     * @see uncork
-     * @access public
+     * Enable pipelined execution. All subsequent commands will be stored until `uncork()` is called, at which point
+     * the commands will be sent to the server in a single write action.
+     *
+     * Optionally provide a callback to execute, after which `uncork` will be called automatically
+     *
+     * @param callable $callback
+     * @return $this|array
      */
     public function pipeline(\Closure $callback = null) {
 
@@ -102,45 +114,25 @@ class Irediscent {
     }
 
     /**
-     * Returns the Redisent instance ready for pipelining.
-     * Redis commands can now be chained, and the array of the responses will be returned when {@link uncork} is called.
-     * @see uncork
-     * @access public
+     * Commands will be pipelined, with the addition of a call to `multi` before and `exec` after the given callback
+     * @see pipeline
+     * @param callable $callback
+     * @return array
      */
     public function multiExec(\Closure $callback) {
 
-        $this->multi();
-
-        $callback($this);
-
-        return $this->exec();
+        return $this->pipeline(function() use($callback){
+            $this->multi();
+            $callback($this);
+            $this->exec();
+        });
     }
 
     /**
-     * Returns the Redisent instance ready for pipelining.
-     * Redis commands can now be chained, and the array of the responses will be returned when {@link uncork} is called.
-     * @see uncork
-     * @access public
+     * Flush the pipelined command queue to the server and return the responses.
+     *
+     * @return array
      */
-    public function multi() {
-
-        $this->pipelined = true;
-
-        return $this->executeCommand('multi');
-    }
-
-    /**
-     * Flushes the commands in the pipeline queue to Redis and returns the responses.
-     * @see pipeline
-     * @access public
-     */
-    public function exec()
-    {
-        $this->pipelined = true;
-
-        return $this->executeCommand('exec')->uncork();
-    }
-
     public function uncork()
     {
         $responses = $this->connection->multiWrite($this->queue);
@@ -152,6 +144,23 @@ class Irediscent {
         return $responses;
     }
 
+    /**
+     * Execute an arbitrary command with an array of arguments
+     *
+     * @param $command
+     * @param array $_args
+     * @return $this|Irediscent
+     */
+    public function execute($command, $_args = array())
+    {
+        return $this->executeCommand($command, is_array($_args) ? $_args : array_slice(func_get_args(),1));
+    }
+
+    /**
+     * @param $name
+     * @param array $args
+     * @return $this
+     */
     protected function executeCommand($name, array $args = array())
     {
         array_unshift($args, strtoupper($name));
@@ -159,18 +168,20 @@ class Irediscent {
         if ($this->pipelined)
         {
             $this->queue[] = $args;
+
             return $this;
-        } else
-        {
-            return $this->connection->write($args);
         }
-    }
-    
-    public function execute($command, $_args = array())
-    {
-        return $this->executeCommand($command, is_array($_args) ? $_args : array_slice(func_get_args(),1));
+
+        return $this->connection->write($args);
     }
 
+    /**
+     * Magic helper allowing $this->hset(), $this->set() etc... style commands
+     *
+     * @param $name
+     * @param $args
+     * @return Irediscent
+     */
     public function __call($name, $args)
     {
         return $this->executeCommand($name, $args);
