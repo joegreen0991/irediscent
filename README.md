@@ -60,7 +60,7 @@ $redis->uncork();
 ~~~
 
 
-MultiExec
+Pipelined MultiExec
 
 ~~~
 
@@ -74,14 +74,35 @@ $redis->multiExec(function($redis){
 
 });
 
+~~~
 
-//Or
+Standard multi exec
 
+~~~
 $redis->multi();
 
 $redis->set('foo',1);
 $redis->set('bar',2);
 
 $redis->exec();
+
+~~~
+
+
+Multi Server Sentinel Connection Provider
+
+The provider will attempt to connect to each sentinel provider in turn and retreive information about the master/slave setup.
+
+The resolved DSN string will then be passed into the connection object
+
+~~~
+
+$sentinels = array(
+    '127.0.0.1:26377',
+    '127.0.0.1:26378',
+    '127.0.0.1:26379',
+);
+
+$redis = new Irediscent(new Irediscent\DsnProvider\SentinelProvider($sentinels));
 
 ~~~
