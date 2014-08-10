@@ -60,8 +60,15 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
         }
         $responses = $pipeline->uncork();
 
-        $this->assertEquals(count($responses), 10);
-        $this->assertEquals($this->r->del('X'), 1);
+        $this->assertCount(10, $responses);
+        $this->assertEquals(1, $this->r->del('X'));
+    }
+
+    function testItExecutesALuaScript() {
+
+        $this->r->eval("redis.call('set',KEYS[1],'hello')", 1, 'evaltest');
+
+        $this->assertEquals('hello', $this->r->eval("return redis.call('get',KEYS[1])", 1, 'evaltest'));
     }
 
     /**
