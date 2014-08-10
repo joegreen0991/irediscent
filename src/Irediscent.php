@@ -34,6 +34,11 @@ class Irediscent {
     private $database;
 
     /**
+     * @var array
+     */
+    private $commandSha = array();
+
+    /**
      * @param string|ConnectionInterface $connection The data source name of the Redis server
      * @param string $password
      * @param array $options
