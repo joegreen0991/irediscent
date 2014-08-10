@@ -1,6 +1,5 @@
 <?php namespace Irediscent\Connection;
 
-use Irediscent\Connection\Serializer\SerializerInterface;
 use Irediscent\DsnProvider\DsnProviderInterface;
 use Irediscent\DsnProvider\StaticProvider;
 
