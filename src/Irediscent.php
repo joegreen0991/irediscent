@@ -181,6 +181,42 @@ class Irediscent {
     }
 
     /**
+     * Switch any eval to an evaSha followed by an eval
+     *
+     * The only time this should not happen is when in a pipeline so we check for that first
+     *
+     * @param $arguments
+     * @return Irediscent
+     * @throws Exception
+     */
+    protected function smartEval($arguments)
+    {
+        if(!$this->pipelined)
+        {
+            $evalCmd = $arguments[0];
+
+            isset($this->commandSha[$evalCmd]) or $this->commandSha[$evalCmd] = sha1($evalCmd);
+
+            $arguments[0] = $this->commandSha[$evalCmd];
+
+            try {
+                return $this->executeCommand('evalSha', $arguments);
+            }
+            catch(RedisException $e)
+            {
+                if(strpos($e->getMessage(), 'NOSCRIPT ') !== 0)
+                {
+                    throw $e;
+                }
+            }
+
+            $arguments[0] = $evalCmd;
+        }
+
+        return $this->executeCommand('eval', $arguments);
+    }
+
+    /**
      * Magic helper allowing $this->hset(), $this->set() etc... style commands
      *
      * @param $name
@@ -189,6 +225,11 @@ class Irediscent {
      */
     public function __call($name, $args)
     {
+        if(strtolower($name) === 'eval')
+        {
+            return $this->smartEval($args);
+        }
+
         return $this->executeCommand($name, $args);
     }
 
