@@ -4,7 +4,7 @@ use Irediscent\Connection\SocketConnection;
 use Irediscent\Connection\Serializer\PurePhp;
 use Irediscent;
 
-include_once 'RealAbstractTest.php';
+include_once __DIR__ . '/RealAbstractTest.php';
 
 class RealPhpSerializerTest extends RealAbstractTest
 {

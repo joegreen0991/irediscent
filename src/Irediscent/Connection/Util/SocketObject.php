@@ -7,7 +7,7 @@ class SocketObject
 {
     public function open($host, $port = null, &$errno = null, &$errstr = null, $timeout = null)
     {
-        return @fsockopen($host, $port, $errno, $errstr, $timeout ?: ini_get("default_socket_timeout"));
+        return @fsockopen($host, $port, $errno, $errstr, $timeout);
     }
 
     public function write($handle, $data)

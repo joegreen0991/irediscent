@@ -31,7 +31,13 @@ class PurePhp implements  SerializerInterface {
 
     private function tryParsingIncomingMessages()
     {
-        $message = $this->readResponse();
+        try {
+            $message = $this->readResponse();
+        }
+        catch(RedisException $e)
+        {
+            $message = $e;
+        }
 
         if ($message === false) {
             // restore previous position for next parsing attempt
@@ -42,6 +48,11 @@ class PurePhp implements  SerializerInterface {
         $this->incomingBuffer = (string)substr($this->incomingBuffer, $this->incomingOffset);
 
         $this->incomingOffset = 0;
+
+        if($message instanceof RedisException)
+        {
+            throw $message;
+        }
 
         return $message;
     }

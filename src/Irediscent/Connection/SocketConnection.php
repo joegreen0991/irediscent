@@ -8,6 +8,7 @@ use Irediscent\Exception\TransmissionException;
 
 class SocketConnection extends ConnectionAbstract {
 
+    const DEFAULT_TIMEOUT = 5.0;
     /**
      * @var SerializerInterface
      */
@@ -17,9 +18,9 @@ class SocketConnection extends ConnectionAbstract {
 
     protected $socket;
 
-    public function __construct($dsn = null, SerializerInterface $serializer = null, $timeout = null)
+    public function __construct($dsn = null, SerializerInterface $serializer = null, $timeout = self::DEFAULT_TIMEOUT)
     {
-        $this->timeout = $timeout;
+        $this->timeout = (float)$timeout;
 
         $this->serializer = $serializer ?: Factory::make();
 

@@ -4,6 +4,8 @@ use Irediscent\Connection\SocketConnection;
 use Irediscent\Connection\Serializer\IRedis;
 use Irediscent;
 
+include_once __DIR__ . '/RealAbstractTest.php';
+
 class RealIredisSerializerTest extends RealAbstractTest
 {
 
