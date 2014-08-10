@@ -2,11 +2,14 @@
 
 use Irediscent\Connection\Factory;
 use Irediscent\Connection\ConnectionInterface;
+use Irediscent\Connection\SocketConnection;
 use Irediscent\Exception\ConnectionException;
 use Irediscent\Exception\NoSentinelsException;
 
 class SentinelProvider implements DsnProviderInterface
 {
+    const SENTINEL_TIMEOUT = 3.0;
+
     protected $sentinels;
 
     protected $mastername;
@@ -22,7 +25,7 @@ class SentinelProvider implements DsnProviderInterface
     {
         foreach($this->sentinels as $sentinel)
         {
-            $connection = $sentinel instanceof ConnectionInterface ? $sentinel : Factory::make($sentinel);
+            $connection = $sentinel instanceof ConnectionInterface ? $sentinel : new SocketConnection($sentinel, null, self::SENTINEL_TIMEOUT);
 
             try
             {
