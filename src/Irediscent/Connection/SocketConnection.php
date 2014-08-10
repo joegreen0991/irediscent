@@ -100,7 +100,7 @@ class SocketConnection extends ConnectionAbstract {
     private function readResponse()
     {
         do {
-            $chunk = $this->socket->gets($this->redis);
+            $chunk = $this->socket->gets($this->redis, 4096);
 
             if ($chunk === false || $chunk === '' || $chunk === null)
             {

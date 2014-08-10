@@ -15,14 +15,9 @@ class SocketObject
         return fwrite($handle, $data);
     }
 
-    public function read($handle, $length)
+    public function gets($handle, $length = null)
     {
-        return fread($handle, $length);
-    }
-
-    public function gets($handle)
-    {
-        return fgets($handle);
+        return fgets($handle, $length);
     }
 
     public function close($handle)
