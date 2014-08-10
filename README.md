@@ -13,7 +13,7 @@ Install via composer
 
 {
     "require": {
-        "irediscent/irediscent": "*"
+        "irediscent/irediscent": "1.*"
     }
 }
 ~~~
