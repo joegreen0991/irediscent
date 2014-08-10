@@ -95,7 +95,7 @@ class PurePhpTest extends \PHPUnit_Framework_TestCase
             $parser->read("hello\r\n");
             $parser->read("@foo\r\n");
         }
-        catch(Irediscent\Exception $e)
+        catch(Irediscent\Exception\Exception $e)
         {
 
         }
@@ -117,7 +117,7 @@ class PurePhpTest extends \PHPUnit_Framework_TestCase
         try{
             $parser->read("-NOSCRIPT use eval\r\n");
         }
-        catch(Irediscent\Exception $e)
+        catch(Irediscent\Exception\Exception $e)
         {
 
         }

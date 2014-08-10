@@ -40,13 +40,18 @@ class Irediscent {
      */
     public function __construct($connection = null, $password = null, $database = null)
     {
-        $this->connection = $connection instanceof ConnectionInterface ? $connection : new SocketConnection($connection);
+        $this->connection = $this->resolveConnection($connection);
 
         $this->password = $password;
 
         $this->database = $database;
 
         $this->connect();
+    }
+
+    protected function resolveConnection($connection)
+    {
+        return $connection instanceof ConnectionInterface ? $connection : new SocketConnection($connection);
     }
 
     /**

@@ -1,4 +1,4 @@
-<?php namespace Irediscent;
+<?php namespace Irediscent\Exception;
 /**
  * Wraps native Redis errors in friendlier PHP exceptions
  */
