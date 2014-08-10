@@ -1,6 +1,7 @@
 <?php
 use Irediscent\Connection\ConnectionInterface;
 use Irediscent\Connection\SocketConnection;
+use Irediscent\Exception\RedisException;
 
 class Irediscent {
 
