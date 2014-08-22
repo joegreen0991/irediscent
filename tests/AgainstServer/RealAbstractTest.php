@@ -3,6 +3,8 @@
 abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 {
 
+    protected $testPrefix = 'irediscent:';
+
     protected $r;
 
     function setUp()
@@ -14,61 +16,61 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
     function testItSetsAndGetsData()
     {
-        $this->assertEquals(true, $this->r->set('foo', 'bar'));
-        $this->assertEquals($this->r->get('foo'), 'bar');
+        $this->assertEquals(true, $this->r->set($this->testPrefix . 'foo', 'bar'));
+        $this->assertEquals($this->r->get($this->testPrefix . 'foo'), 'bar');
 
         $this->r->disconnect();
     }
 
     function testItHsetsAndGetsMultipleData()
     {
-        $this->r->hmset('test', 'one', 1, 'two', 2);
+        $this->r->hmset($this->testPrefix . 'test', 'one', 1, 'two', 2);
 
-        $this->assertEquals(array('one', 1, 'two', 2), $this->r->hgetall('test'));
+        $this->assertEquals(array('one', 1, 'two', 2), $this->r->hgetall($this->testPrefix . 'test'));
     }
 
     function testItChecksKeyExists()
     {
-        $this->assertEquals($this->r->exists('foo'), 1);
-        $this->assertEquals($this->r->exists('bar'), 0);
+        $this->assertEquals($this->r->exists($this->testPrefix . 'foo'), 1);
+        $this->assertEquals($this->r->exists($this->testPrefix . 'bar'), 0);
     }
 
     function testItDeletesAKey() {
-        $this->assertEquals($this->r->del('foo'), 1);
-        $this->assertNull($this->r->get('foo'));
+        $this->assertEquals($this->r->del($this->testPrefix . 'foo'), 1);
+        $this->assertNull($this->r->get($this->testPrefix . 'foo'));
     }
 
     function testItCallsFluentPipelineIncr() {
         // Test the fluent interface
         $responses = $this->r->pipeline()
-            ->set('X',1)
-            ->incr('X')
-            ->incr('X')
-            ->incr('X')
-            ->incr('X')
+            ->set($this->testPrefix . 'X',1)
+            ->incr($this->testPrefix . 'X')
+            ->incr($this->testPrefix . 'X')
+            ->incr($this->testPrefix . 'X')
+            ->incr($this->testPrefix . 'X')
             ->uncork();
         $this->assertEquals(count($responses), 5);
-        $this->assertEquals($this->r->get('X'), 5);
-        $this->assertEquals($this->r->del('X'), 1);
+        $this->assertEquals($this->r->get($this->testPrefix . 'X'), 5);
+        $this->assertEquals($this->r->del($this->testPrefix . 'X'), 1);
     }
 
     function testItCallsProceduralPipelinedIncr() {
         // Test a less fluent interface
         $pipeline = $this->r->pipeline();
         for ($i = 0; $i < 10; $i++) {
-            $pipeline->incr('X');
+            $pipeline->incr($this->testPrefix . 'X');
         }
         $responses = $pipeline->uncork();
 
         $this->assertCount(10, $responses);
-        $this->assertEquals(1, $this->r->del('X'));
+        $this->assertEquals(1, $this->r->del($this->testPrefix . 'X'));
     }
 
     function testItExecutesALuaScript() {
 
-        $this->r->eval("redis.call('set',KEYS[1],'hello')", 1, 'evaltest');
+        $this->r->eval("redis.call('set',KEYS[1],'hello')", 1, $this->testPrefix . 'evaltest');
 
-        $this->assertEquals('hello', $this->r->eval("return redis.call('get',KEYS[1])", 1, 'evaltest'));
+        $this->assertEquals('hello', $this->r->eval("return redis.call('get',KEYS[1])", 1, $this->testPrefix . 'evaltest'));
     }
 
     /**
@@ -100,11 +102,11 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
         while($score--)
         {
-            $this->r->zadd('testzrange', $score, $data);
+            $this->r->zadd($this->testPrefix . 'testzrange', $score, $data);
         }
 
-        $this->r->zrangebyscore('testzrange', 0, 'inf', 'WITHSCORES');
+        $this->r->zrangebyscore($this->testPrefix . 'testzrange', 0, 'inf', 'WITHSCORES');
 
-        $this->r->eval("return redis.call('zrangebyscore',KEYS[1],0,'inf')", 1, 'testzrange');
+        $this->r->eval("return redis.call('zrangebyscore',KEYS[1],0,'inf')", 1, $this->testPrefix . 'testzrange');
     }
 }
