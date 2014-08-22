@@ -96,7 +96,7 @@ class PurePhp implements  SerializerInterface {
      * @link https://github.com/jdp/redisent
      */
     private function readResponse() {
-
+        
         if (($chunk = $this->readLine()) === false)
         {
             return false;
