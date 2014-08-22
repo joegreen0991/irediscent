@@ -96,6 +96,8 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
     function testItSetsAndReadsLargeData()
     {
+        $this->r->del($this->testPrefix . 'testzrange');
+
         $score = 5000;
 
         $data = '{"Data1":"1","Data2":"2","Data3":"3"}';
