@@ -104,5 +104,7 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->r->zrangebyscore('testzrange', 0, 'inf', 'WITHSCORES');
+
+        $this->r->eval("return redis.call('zrangebyscore',KEYS[1],0,'inf')", 1, 'testzrange');
     }
 }
