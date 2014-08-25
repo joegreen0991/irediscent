@@ -10,6 +10,6 @@ class RealPhpSerializerTest extends RealAbstractTest
 {
     protected function getConnection($conn = null)
     {
-        return new Irediscent(new SocketConnection($conn, new PurePhp()));
+        return new Irediscent(new SocketConnection($conn));
     }
 }

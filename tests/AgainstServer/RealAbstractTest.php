@@ -100,15 +100,26 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
 
         $score = 5000;
 
-        $data = '{"Data1":"1","Data2":"2","Data3":"3"}';
+        $id = 0;
 
+        $this->r->pipeline();
         while($score--)
         {
-            $this->r->zadd($this->testPrefix . 'testzrange', $score, $data);
+            $this->r->hmset('testzrange:h:'. $id, 'data1', 1, 'data2', 2);
+            $this->r->zadd($this->testPrefix . 'testzrange', $score, $id++);
         }
+        $this->r->uncork();
 
         $this->r->zrangebyscore($this->testPrefix . 'testzrange', 0, 'inf', 'WITHSCORES');
 
-        $this->r->eval("return redis.call('zrangebyscore',KEYS[1],0,'inf')", 1, $this->testPrefix . 'testzrange');
+        $cmd =
+        "local list = redis.call('zrangebyscore', KEYS[1], 0, 'inf')" . PHP_EOL .
+        "local data = {}" . PHP_EOL .
+        "for i, dataId in ipairs(list) do" . PHP_EOL .
+            "table.insert(data, redis.call('hgetall', KEYS[2] .. dataId)) " . PHP_EOL .
+        "end" . PHP_EOL .
+        "return data";
+
+        $this->r->eval($cmd, 2, $this->testPrefix . 'testzrange', $this->testPrefix .'testzrange:h:');
     }
 }

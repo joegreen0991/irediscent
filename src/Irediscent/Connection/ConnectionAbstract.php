@@ -54,4 +54,45 @@ abstract class ConnectionAbstract implements ConnectionInterface {
 
         $this->connect();
     }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function write($data)
+    {
+        $this->safeConnect();
+
+        $this->writeCommand($data);
+
+        return $this->readResponse();
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public function multiWrite($data)
+    {
+        $this->safeConnect();
+
+        /* Open a Redis connection and execute the queued commands */
+        foreach ($data as $rawCommand)
+        {
+            $this->writeCommand($rawCommand);
+        }
+
+        // Read in the results from the pipelined commands
+        $responses = array();
+        for ($i = 0; $i < count($data); $i++)
+        {
+            $responses[] = $this->readResponse();
+        }
+
+        return $responses;
+    }
+
+    abstract protected function writeCommand($data);
+
+    abstract protected function readResponse();
 }

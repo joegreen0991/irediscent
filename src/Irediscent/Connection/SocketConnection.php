@@ -1,28 +1,24 @@
 <?php namespace Irediscent\Connection;
 
-use Irediscent\Connection\Serializer\Factory;
-use Irediscent\Connection\Serializer\SerializerInterface;
 use Irediscent\Connection\Util\SocketObject;
 use Irediscent\Exception\ConnectionException;
+use Irediscent\Exception\RedisException;
 use Irediscent\Exception\TransmissionException;
+use Irediscent\Exception\UnknownResponseException;
 
 class SocketConnection extends ConnectionAbstract {
 
     const DEFAULT_TIMEOUT = 5.0;
-    /**
-     * @var SerializerInterface
-     */
-    protected $serializer;
+
+    const CRLF = "\r\n";
 
     protected $timeout;
 
     protected $socket;
 
-    public function __construct($dsn = null, SerializerInterface $serializer = null, $timeout = self::DEFAULT_TIMEOUT)
+    public function __construct($dsn = null, $timeout = null)
     {
-        $this->timeout = (float)$timeout;
-
-        $this->serializer = $serializer ?: Factory::make();
+        $this->timeout = is_null($timeout) ? self::DEFAULT_TIMEOUT : (float)$timeout;
 
         $this->socket = new SocketObject();
 
@@ -53,38 +49,20 @@ class SocketConnection extends ConnectionAbstract {
         $this->redis = null;
     }
 
-    public function write($data)
+    protected function serialize($data)
     {
-        $this->safeConnect();
+        $command = '*' . count($data) . self::CRLF;
 
-        $this->writeRaw($data);
-
-        return $this->readResponse();
-    }
-
-    public function multiWrite($data)
-    {
-        $this->safeConnect();
-
-        /* Open a Redis connection and execute the queued commands */
-        foreach ($data as $rawCommand)
-        {
-            $this->writeRaw($rawCommand);
+        foreach ($data as $arg) {
+            $command .= '$' . strlen($arg) . self::CRLF . $arg . self::CRLF;
         }
 
-        // Read in the results from the pipelined commands
-        $responses = array();
-        for ($i = 0; $i < count($data); $i++)
-        {
-            $responses[] = $this->readResponse();
-        }
-
-        return $responses;
+        return $command;
     }
 
-    private function writeRaw($data)
+    protected function writeCommand($data)
     {
-        $command = $this->serializer->serialize($data);
+        $command = $this->serialize($data);
 
         for ($written = 0; $written < strlen($command); $written += $fwrite)
         {
@@ -97,18 +75,56 @@ class SocketConnection extends ConnectionAbstract {
         }
     }
 
-    private function readResponse()
+    protected function readResponse()
     {
-        do {
-            $chunk = $this->socket->gets($this->redis, 4096);
+        $chunk = $this->socket->gets($this->redis);
 
-            if ($chunk === false || $chunk === '' || $chunk === null)
-            {
-                throw new TransmissionException('Failed to read response from stream');
-            }
+        if ($chunk === false || $chunk === '' || $chunk === null)
+        {
+            throw new TransmissionException('Failed to read response from stream');
+        }
 
-        }while(($result = $this->serializer->read($chunk)) === false);
+        $prefix  = $chunk[0];
+        $payload = substr($chunk, 1, -2);
 
-        return $result;
+        switch ($prefix) {
+            case '-':
+                throw new RedisException($payload);
+            case ':':
+                return (int) $payload;
+            case '+':
+                return $payload === 'OK' ? true : $payload;
+            case '$':
+                $count = (int) $payload;
+                if ($count === -1)
+                {
+                    return null;
+                }
+
+                $count += 2;
+
+                $data = $this->socket->read($this->redis, $count);
+
+                if ($data === false)
+                {
+                    throw new TransmissionException("Failed to read inline data packet from server");
+                }
+                return substr($data,0, -2);
+            /* Multi-bulk reply */
+            case '*':
+                $count = (int) $payload;
+
+                if ($count === -1) {
+                    return null;
+                }
+
+                $response = array();
+                for ($i = 0; $i < $count; $i++) {
+                    $response[] = $this->readResponse();
+                }
+                return $response;
+            default:
+                throw new UnknownResponseException("Received '$prefix' as response type");
+        }
     }
 }

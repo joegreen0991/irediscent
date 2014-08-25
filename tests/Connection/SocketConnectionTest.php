@@ -5,6 +5,7 @@ use Irediscent;
 class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 {
 
+    /*
     public function testItCorrectlySendsCommandsToTheSerializer()
     {
 
@@ -88,6 +89,8 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($obj->isConnected());
 
     }
+*/
+
 
     public function testItReConnectsWhenAsked()
     {
@@ -107,9 +110,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('open')
             ->will($this->returnValue('#resource'));
 
-        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
-
-        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection();
 
         $obj->setSocketObject($mock);
 
@@ -132,13 +133,15 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('open')
             ->will($this->returnValue('#resource'));
 
-        $mock->expects($this->any())
+        $mock->expects($this->at(1))
+            ->method('write')
+            ->will($this->returnValue(14));
+
+        $mock->expects($this->at(2))
             ->method('gets')
-            ->will($this->returnValue(1));
+            ->will($this->returnValue('+ok'));
 
-        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
-
-        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection();
 
         $obj->setSocketObject($mock);
 
@@ -163,9 +166,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
              ->will($this->returnValue(false));
 
 
-        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
-
-        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection();
 
         $obj->setSocketObject($mock);
 
@@ -183,10 +184,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('open')
             ->will($this->returnValue(true));
 
-
-        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
-
-        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection();
 
         $obj->setSocketObject($mock);
 
@@ -212,16 +210,7 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
             ->method('gets')
             ->will($this->returnValue(false));
 
-        $mockSerializer = $this->getMock('Irediscent\Connection\Serializer\SerializerInterface');
-
-        $mockSerializer->expects($this->at(0))
-            ->method('serialize')
-            ->with(array(
-                'data'
-            ))
-            ->will($this->returnValue("data"));
-
-        $obj = new Irediscent\Connection\SocketConnection(null, $mockSerializer);
+        $obj = new Irediscent\Connection\SocketConnection();
 
         $obj->setSocketObject($mock);
 

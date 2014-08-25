@@ -57,7 +57,7 @@ class Irediscent {
 
     protected function resolveConnection($connection)
     {
-        return $connection instanceof ConnectionInterface ? $connection : new SocketConnection($connection);
+        return $connection instanceof ConnectionInterface ? $connection : \Irediscent\Connection\Factory::make($connection);
     }
 
     /**
