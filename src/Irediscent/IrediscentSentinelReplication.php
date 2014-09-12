@@ -13,9 +13,7 @@ class IrediscentSentinelReplication extends \Irediscent {
      */
     public function __construct(array $sentinels, $mastername, $password = null, $database = null)
     {
-        $connection = new SocketConnection(new SentinelProvider($sentinels, $mastername));
-
-        parent::__construct($connection, $password, $database);
+        parent::__construct(new SentinelProvider($sentinels, $mastername), $password, $database);
     }
 
     /**
