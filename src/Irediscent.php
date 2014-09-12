@@ -40,6 +40,15 @@ class Irediscent {
     private $commandSha = array();
 
     /**
+     * @var array
+     */
+    private $formatters = array(
+        'hgetall' => 'Irediscent\Formatter\ArrayResponse'
+    );
+
+    private $formattersCache = array();
+
+    /**
      * @param string|ConnectionInterface $connection The data source name of the Redis server
      * @param string $password
      * @param array $options
@@ -183,7 +192,22 @@ class Irediscent {
             return $this;
         }
 
-        return $this->connection->write($args);
+        return $this->format($name, $this->connection->write($args));
+    }
+
+    protected function format($command, $response)
+    {
+        if(isset($this->formatters[$command]))
+        {
+            if(!isset($this->formattersCache[$command]))
+            {
+                $this->formattersCache[$command] = new $this->formatters[$command];
+            }
+
+            return $this->formattersCache[$command]->format($response);
+        }
+
+        return $response;
     }
 
     /**

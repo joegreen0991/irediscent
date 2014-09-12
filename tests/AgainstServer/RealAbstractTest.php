@@ -26,7 +26,7 @@ abstract class RealAbstractTest extends \PHPUnit_Framework_TestCase
     {
         $this->r->hmset($this->testPrefix . 'test', 'one', 1, 'two', 2);
 
-        $this->assertEquals(array('one', 1, 'two', 2), $this->r->hgetall($this->testPrefix . 'test'));
+        $this->assertEquals(array('one' => 1, 'two' => 2), $this->r->hgetall($this->testPrefix . 'test'));
     }
 
     function testItChecksKeyExists()
