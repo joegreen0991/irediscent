@@ -19,12 +19,12 @@ class SentinelProviderTest extends \PHPUnit_Framework_TestCase
 
         $mock1->expects($this->at(1))
             ->method('write')
-            ->with($this->equalTo("SENTINEL get-master-addr-by-name mymaster"))
+            ->with($this->equalTo(array('SENTINEL', 'get-master-addr-by-name', 'mymaster')))
             ->will($this->returnValue(array_values($return)));
 
         $mock1->expects($this->at(2))
             ->method('write')
-            ->with($this->equalTo("QUIT"));
+            ->with($this->equalTo(array('QUIT')));
 
         $sentinels = array(
             $mock1
@@ -65,12 +65,12 @@ class SentinelProviderTest extends \PHPUnit_Framework_TestCase
 
         $mock1->expects($this->at(1))
             ->method('write')
-            ->with($this->equalTo("SENTINEL slaves mymaster"))
+            ->with($this->equalTo(array('SENTINEL', 'slaves', 'mymaster')))
             ->will($this->returnValue($return));
 
         $mock1->expects($this->at(2))
             ->method('write')
-            ->with($this->equalTo("QUIT"));
+            ->with($this->equalTo(array('QUIT')));
 
         $sentinels = array(
             $mock1
@@ -110,11 +110,11 @@ class SentinelProviderTest extends \PHPUnit_Framework_TestCase
 
         $mock2->expects($this->at(1))
             ->method('write')
-            ->with($this->equalTo("SENTINEL get-master-addr-by-name mymaster"));
+            ->with($this->equalTo(array('SENTINEL', 'get-master-addr-by-name', 'mymaster')));
 
         $mock2->expects($this->at(2))
             ->method('write')
-            ->with($this->equalTo("QUIT"));
+            ->with($this->equalTo(array('QUIT')));
 
         $mock3->expects($this->never())
             ->method('write');

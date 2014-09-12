@@ -38,7 +38,7 @@ class SentinelProvider implements DsnProviderInterface
 
             $response = $connection->write($command);
 
-            $connection->write("QUIT");
+            $connection->write(array('QUIT'));
 
             return $response;
         }
@@ -48,7 +48,7 @@ class SentinelProvider implements DsnProviderInterface
 
     public function getMasterDsn()
     {
-        $response = $this->runCommand('SENTINEL get-master-addr-by-name ' . $this->mastername);
+        $response = $this->runCommand(array('SENTINEL', 'get-master-addr-by-name', $this->mastername));
 
         return array(
             'host' => $response[0],
@@ -58,7 +58,7 @@ class SentinelProvider implements DsnProviderInterface
 
     public function getSlavesDsn()
     {
-        $slaves = $this->runCommand('SENTINEL slaves ' . $this->mastername);
+        $slaves = $this->runCommand(array('SENTINEL', 'slaves', $this->mastername));
 
         foreach($slaves as $i => $slave)
         {
