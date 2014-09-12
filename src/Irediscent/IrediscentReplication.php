@@ -1,5 +1,7 @@
 <?php namespace Irediscent;
 
+#INCOMPLETE
+
 use Irediscent\Connection\ConnectionInterface;
 
 class IrediscentReplication extends \Irediscent {
