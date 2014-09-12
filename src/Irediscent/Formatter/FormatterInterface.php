@@ -2,5 +2,5 @@
 
 interface FormatterInterface
 {
-    public function format($response);
+    public function format($command, $response);
 }

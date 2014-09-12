@@ -43,7 +43,12 @@ class Irediscent {
      * @var array
      */
     private $formatters = array(
-        'hgetall' => 'Irediscent\Formatter\ArrayResponse'
+        'hgetall'       => 'Irediscent\Formatter\ArrayResponse',
+        'config'        => 'Irediscent\Formatter\ArrayResponse',
+        'sentinel'      => 'Irediscent\Formatter\SentinelResponse',
+        'scan'          => 'Irediscent\Formatter\ScanResponse',
+        'hscan'         => 'Irediscent\Formatter\ScanResponse',
+        'zscan'         => 'Irediscent\Formatter\ScanResponse',
     );
 
     private $formattersCache = array();
@@ -204,7 +209,7 @@ class Irediscent {
                 $this->formattersCache[$command] = new $this->formatters[$command];
             }
 
-            return $this->formattersCache[$command]->format($response);
+            return $this->formattersCache[$command]->format($command, $response);
         }
 
         return $response;
