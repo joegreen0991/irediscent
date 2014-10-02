@@ -44,7 +44,10 @@ class SocketConnection extends ConnectionAbstract {
 
     public function disconnect()
     {
-        $this->socket->close($this->redis);
+        if($this->isConnected())
+        {
+            $this->socket->close($this->redis);
+        }
 
         $this->redis = null;
     }
