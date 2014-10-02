@@ -116,6 +116,16 @@ class Irediscent {
     }
 
     /**
+     * @return $this
+     */
+    public function isConnected()
+    {
+        $this->connection->isConnected();
+
+        return $this;
+    }
+
+    /**
      * Enable pipelined execution. All subsequent commands will be stored until `uncork()` is called, at which point
      * the commands will be sent to the server in a single write action.
      *
@@ -186,8 +196,13 @@ class Irediscent {
      * @param array $args
      * @return $this
      */
-    protected function executeCommand($name, array $args = array())
+    public function executeCommand($name, array $args = array())
     {
+        if(!$this->isConnected())
+        {
+            $this->connect();
+        }
+
         array_unshift($args, strtoupper($name));
 
         if ($this->pipelined)

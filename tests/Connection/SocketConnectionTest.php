@@ -120,36 +120,8 @@ class SocketConnectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($obj->isConnected());
 
-        $obj->reconnect();
-
-        $this->assertTrue($obj->isConnected());
-    }
-
-    public function testItAutoConnectsWhenFirstCommandIsPerformed()
-    {
-        $mock = $this->getMock('Irediscent\Connection\Util\SocketObject');
-
-        $mock->expects($this->at(0))
-            ->method('open')
-            ->will($this->returnValue('#resource'));
-
-        $mock->expects($this->at(1))
-            ->method('write')
-            ->will($this->returnValue(14));
-
-        $mock->expects($this->at(2))
-            ->method('gets')
-            ->will($this->returnValue('+ok'));
-
-        $obj = new Irediscent\Connection\SocketConnection();
-
-        $obj->setSocketObject($mock);
-
-        $this->assertFalse($obj->isConnected());
-
-        $obj->write(array(
-            'data'
-        ));
+        $obj->disconnect();
+        $obj->connect();
 
         $this->assertTrue($obj->isConnected());
     }

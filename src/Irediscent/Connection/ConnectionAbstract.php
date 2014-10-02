@@ -31,38 +31,12 @@ abstract class ConnectionAbstract implements ConnectionInterface {
         return $this->redis !== null;
     }
 
-    /*
-     *
-     */
-    protected function safeConnect()
-    {
-        if(!$this->isConnected())
-        {
-            $this->connect();
-        }
-    }
-
-    /**
-     *
-     */
-    public function reconnect()
-    {
-        if($this->isConnected())
-        {
-            $this->disconnect();
-        }
-
-        $this->connect();
-    }
-
     /**
      * @param $data
      * @return mixed
      */
     public function write($data)
     {
-        $this->safeConnect();
-
         $this->writeCommand($data);
 
         return $this->readResponse();
@@ -74,8 +48,6 @@ abstract class ConnectionAbstract implements ConnectionInterface {
      */
     public function multiWrite($data)
     {
-        $this->safeConnect();
-
         /* Open a Redis connection and execute the queued commands */
         foreach ($data as $rawCommand)
         {

@@ -21,7 +21,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         new Irediscent();
     }
 
-    public function testItConnectsWithPasswordAndPassword()
+    public function testItConnectsWithPasswordAndDatabase()
     {
         $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
@@ -30,12 +30,12 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
                     ->method('connect');
 
         // Configure the stub.
-        $connection->expects($this->at(1))
+        $connection->expects($this->at(2))
             ->method('write')
             ->with($this->equalTo(array('AUTH','password')));
 
         // Configure the stub.
-        $connection->expects($this->at(2))
+        $connection->expects($this->at(4))
             ->method('write')
             ->with($this->equalTo(array('SELECT', 4)));
 
@@ -48,16 +48,16 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
         // Configure the stub.
-        $connection->expects($this->once())
+        $connection->expects($this->at(0))
             ->method('connect');
 
         // Configure the stub.
-        $connection->expects($this->at(1))
+        $connection->expects($this->at(2))
             ->method('write')
             ->with($this->equalTo(array('GET','key', 1)));
 
         // Configure the stub.
-        $connection->expects($this->at(2))
+        $connection->expects($this->at(4))
             ->method('write')
             ->with($this->equalTo(array('GET','key2', 2)));
 
@@ -128,7 +128,7 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
     {
         list($redis, $connection) = $this->getObjectAndMock();
 
-        $connection->expects($this->at(0))
+        $connection->expects($this->once())
             ->method('multiWrite')
             ->with($this->equalTo(array(
                 array('MULTI'),
@@ -165,6 +165,30 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         $redis->connect();
 
         $redis->disconnect();
+    }
+
+    public function testItAutoConnectsWhenFirstCommandIsPerformed()
+    {
+        list($redis, $connection) = $this->getObjectAndMock();
+
+        $connection->expects($this->at(0))
+            ->method('connect');
+
+        $connection->expects($this->at(1))
+            ->method('disconnect');
+
+        $connection->expects($this->at(2))
+            ->method('isConnected')
+            ->will($this->returnValue(false));
+
+        $connection->expects($this->at(3))
+            ->method('connect');
+
+        $redis->connect();
+
+        $redis->disconnect();
+
+        $redis->hget();
     }
 
 }
