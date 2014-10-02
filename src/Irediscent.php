@@ -201,7 +201,7 @@ class Irediscent {
      * @param array $args
      * @return $this
      */
-    public function executeCommand($name, array $args = array())
+    protected function executeCommand($name, array $args = array())
     {
         if(!$this->isConnected())
         {
