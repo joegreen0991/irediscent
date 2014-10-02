@@ -80,6 +80,11 @@ class Irediscent {
      */
     public function connect()
     {
+        if($this->isConnected())
+        {
+            return $this;
+        }
+
         $this->connection->connect();
 
         if($this->password)
@@ -101,7 +106,10 @@ class Irediscent {
      */
     public function disconnect()
     {
-        $this->connection->disconnect();
+        if($this->isConnected())
+        {
+            $this->connection->disconnect();
+        }
 
         return $this;
     }
@@ -120,9 +128,7 @@ class Irediscent {
      */
     public function isConnected()
     {
-        $this->connection->isConnected();
-
-        return $this;
+        return $this->connection->isConnected();
     }
 
     /**
@@ -170,10 +176,7 @@ class Irediscent {
      */
     public function uncork()
     {
-        if(!$this->isConnected())
-        {
-            $this->connect();
-        }
+        $this->connect();
 
         $responses = $this->connection->multiWrite($this->queue);
 
@@ -203,10 +206,7 @@ class Irediscent {
      */
     protected function executeCommand($name, array $args = array())
     {
-        if(!$this->isConnected())
-        {
-            $this->connect();
-        }
+        $this->connect();
 
         array_unshift($args, strtoupper($name));
 

@@ -26,16 +26,31 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMock('Irediscent\Connection\ConnectionInterface');
 
         // Configure the stub.
-        $connection->expects($this->once())
-                    ->method('connect');
+        $connection->expects($this->at(0))
+            ->method('isConnected')
+            ->will($this->returnValue(false));
+
+        // Configure the stub.
+        $connection->expects($this->at(1))
+            ->method('connect');
 
         // Configure the stub.
         $connection->expects($this->at(2))
+            ->method('isConnected')
+            ->will($this->returnValue(true));
+
+        // Configure the stub.
+        $connection->expects($this->at(3))
             ->method('write')
             ->with($this->equalTo(array('AUTH','password')));
 
         // Configure the stub.
         $connection->expects($this->at(4))
+            ->method('isConnected')
+            ->will($this->returnValue(true));
+
+        // Configure the stub.
+        $connection->expects($this->at(5))
             ->method('write')
             ->with($this->equalTo(array('SELECT', 4)));
 
@@ -49,15 +64,30 @@ class IrediscentTest extends \PHPUnit_Framework_TestCase
 
         // Configure the stub.
         $connection->expects($this->at(0))
+            ->method('isConnected')
+            ->will($this->returnValue(false));
+
+        // Configure the stub.
+        $connection->expects($this->at(1))
             ->method('connect');
 
         // Configure the stub.
         $connection->expects($this->at(2))
+            ->method('isConnected')
+            ->will($this->returnValue(true));
+
+        // Configure the stub.
+        $connection->expects($this->at(3))
             ->method('write')
             ->with($this->equalTo(array('GET','key', 1)));
 
         // Configure the stub.
         $connection->expects($this->at(4))
+            ->method('isConnected')
+            ->will($this->returnValue(true));
+
+        // Configure the stub.
+        $connection->expects($this->at(5))
             ->method('write')
             ->with($this->equalTo(array('GET','key2', 2)));
 
