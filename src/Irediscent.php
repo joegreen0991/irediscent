@@ -170,6 +170,11 @@ class Irediscent {
      */
     public function uncork()
     {
+        if(!$this->isConnected())
+        {
+            $this->connect();
+        }
+
         $responses = $this->connection->multiWrite($this->queue);
 
         $this->pipelined = false;

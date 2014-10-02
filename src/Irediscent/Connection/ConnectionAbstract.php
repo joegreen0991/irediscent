@@ -6,13 +6,6 @@ use Irediscent\DsnProvider\StaticProvider;
 abstract class ConnectionAbstract implements ConnectionInterface {
 
     /**
-     * Socket connection to the Redis server
-     * @var resource
-     * @access private
-     */
-    protected $redis;
-
-    /**
      * @var \Irediscent\DsnProvider\DsnProviderInterface
      */
     protected $dsn;
@@ -21,14 +14,6 @@ abstract class ConnectionAbstract implements ConnectionInterface {
     public function __construct($dsn = null)
     {
         $this->dsn = $dsn instanceof DsnProviderInterface ? $dsn : new StaticProvider($dsn);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isConnected()
-    {
-        return $this->redis !== null;
     }
 
     /**

@@ -16,6 +16,13 @@ class SocketConnection extends ConnectionAbstract {
 
     protected $socket;
 
+    /**
+     * Socket connection to the Redis server
+     * @var resource
+     * @access private
+     */
+    protected $redis;
+
     public function __construct($dsn = null, $timeout = null)
     {
         $this->timeout = is_null($timeout) ? self::DEFAULT_TIMEOUT : (float)$timeout;
@@ -42,12 +49,17 @@ class SocketConnection extends ConnectionAbstract {
         }
     }
 
+    /**
+     * @return bool
+     */
+    public function isConnected()
+    {
+        return $this->redis !== null;
+    }
+
     public function disconnect()
     {
-        if($this->isConnected())
-        {
-            $this->socket->close($this->redis);
-        }
+        $this->socket->close($this->redis);
 
         $this->redis = null;
     }
