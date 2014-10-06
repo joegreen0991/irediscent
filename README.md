@@ -1,4 +1,4 @@
-IRedisent
+IRediscent
 ========
 [![Build Status](https://travis-ci.org/joegreen0991/irediscent.svg)](https://travis-ci.org/joegreen0991/irediscent)  [![Coverage Status](https://coveralls.io/repos/joegreen0991/irediscent/badge.png?branch=master)](https://coveralls.io/r/joegreen0991/irediscent?branch=master)
 
