@@ -110,21 +110,32 @@ class SocketConnection extends ConnectionAbstract {
             case '+':
                 return $payload === 'OK' ? true : $payload;
             case '$':
-                $count = (int) $payload;
-                if ($count === -1)
+                $size = (int) $payload;
+                if ($size === -1)
                 {
                     return null;
                 }
+                $response = '';
+                $read = 0;
+                if ($size > 0) {
+                    do {
+                        $block_size = ($size - $read) > 1024 ? 1024 : ($size - $read);
+                        $data = $this->socket->read($this->redis, $block_size);
 
-                $count += 2;
+                        if ($data === false)
+                        {
+                            throw new TransmissionException("Failed to read inline data packet from server");
+                        }
 
-                $data = $this->socket->read($this->redis, $count);
-
-                if ($data === false)
-                {
-                    throw new TransmissionException("Failed to read inline data packet from server");
+                        $read += strlen($data);
+                        $response .= $data;
+                    } while ($read < $size);
                 }
-                return substr($data,0, -2);
+
+                $this->socket->read($this->redis, 2); // Discard CRLF
+
+                return $response;
+
             /* Multi-bulk reply */
             case '*':
                 $count = (int) $payload;
