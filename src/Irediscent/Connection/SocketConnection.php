@@ -92,7 +92,7 @@ class SocketConnection extends ConnectionAbstract {
 
     protected function readResponse()
     {
-        $chunk = $this->socket->gets($this->redis);
+        $chunk = $this->socket->gets($this->redis, 512);
 
         if ($chunk === false || $chunk === '' || $chunk === null)
         {
