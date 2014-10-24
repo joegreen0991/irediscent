@@ -1,6 +1,6 @@
 IRediscent
 ========
-[![Build Status](https://travis-ci.org/joegreen0991/irediscent.svg)](https://travis-ci.org/joegreen0991/irediscent)  [![Coverage Status](https://coveralls.io/repos/joegreen0991/irediscent/badge.png?branch=master)](https://coveralls.io/r/joegreen0991/irediscent?branch=master)
+[![Build Status](https://travis-ci.org/mrjgreen/irediscent.svg)](https://travis-ci.org/mrjgreen/irediscent)  [![Coverage Status](https://coveralls.io/repos/mrjgreen/irediscent/badge.png?branch=master)](https://coveralls.io/r/mrjgreen/irediscent?branch=master)
 
 Lightweight php handler for iredis with redisent fallback
 
@@ -66,7 +66,6 @@ Pipelined MultiExec
 
 $redis = new Irediscent();
 
-
 $redis->multiExec(function($redis){
 
     $redis->set('foo',1);
@@ -88,12 +87,12 @@ $redis->exec();
 
 ~~~
 
+##Redis Sentinel
+Irediscent is capable of working with redis servers in a sentiel cluster out of the box, using `SentinelProvider` DSN provider.
 
-Multi Server Sentinel Connection Provider
+The provider will attempt to connect to each sentinel instance in turn until it reaches an active sentinel, and retreive information about the master/slave setup.
 
-The provider will attempt to connect to each sentinel provider in turn and retreive information about the master/slave setup.
-
-The resolved DSN string will then be passed into the connection object
+The resolved DSN string will then be passed into the connection object. If the redis cluster master configuration changes during the life time of the connection, a "Cannot write against a read-only slave" error may be returned from the redis server, that was previously the master. Irediscent will handle this error, re-interrogate the sentinels and recommit the write action against the new master.
 
 ~~~
 
