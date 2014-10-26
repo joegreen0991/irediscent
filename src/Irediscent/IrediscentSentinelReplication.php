@@ -5,6 +5,8 @@ use Irediscent\Exception\RedisException;
 
 class IrediscentSentinelReplication extends \Irediscent {
 
+    private $connectionRetries = 5;
+
     /**
      * @param array $sentinels
      * @param null|string $mastername
@@ -27,17 +29,22 @@ class IrediscentSentinelReplication extends \Irediscent {
      */
     protected function executeCommand($name, array $args = array())
     {
-        $retry = 5; // Avoid infinite loop
+        $retry = $this->connectionRetries; // Avoid infinite loop
 
-        do {
+        while($retry--)
+        {
             try {
                 return parent::executeCommand($name, $args);
-            }
-            catch (RedisException $e) {}
-        }
-        while($this->exceptionIsReadonlySlave($e) && $retry--);
+            } catch (RedisException $e) {
+                if (!$this->exceptionIsReadonlySlave($e)) {
+                    throw $e;
+                }
 
-        throw $e;
+                $this->reconnect();
+            }
+        }
+
+        throw new RedisException("Could not reconnect to master after $this->connectionRetries attempts");
     }
 
     /**
