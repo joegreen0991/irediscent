@@ -8,12 +8,25 @@ use Irediscent\Exception\NoSentinelsException;
 
 class SentinelProvider implements DsnProviderInterface
 {
+    /**
+     * The length of time to wait before trying the next sentinel
+     */
     const SENTINEL_TIMEOUT = 3.0;
 
+    /**
+     * @var array
+     */
     protected $sentinels;
 
+    /**
+     * @var string
+     */
     protected $mastername;
 
+    /**
+     * @param array $sentinels
+     * @param $mastername
+     */
     public function __construct(array $sentinels, $mastername)
     {
         $this->sentinels = $sentinels;
@@ -21,6 +34,11 @@ class SentinelProvider implements DsnProviderInterface
         $this->mastername = $mastername;
     }
 
+    /**
+     * @param $command
+     * @return mixed
+     * @throws NoSentinelsException
+     */
     protected function runCommand($command)
     {
         foreach($this->sentinels as $sentinel)
@@ -46,6 +64,10 @@ class SentinelProvider implements DsnProviderInterface
         throw new NoSentinelsException("Could not connect to any sentinel");
     }
 
+    /**
+     * @return array
+     * @throws NoSentinelsException
+     */
     public function getMasterDsn()
     {
         $response = $this->runCommand(array('SENTINEL', 'get-master-addr-by-name', $this->mastername));
@@ -56,6 +78,10 @@ class SentinelProvider implements DsnProviderInterface
         );
     }
 
+    /**
+     * @return mixed
+     * @throws NoSentinelsException
+     */
     public function getSlavesDsn()
     {
         $slaves = $this->runCommand(array('SENTINEL', 'slaves', $this->mastername));

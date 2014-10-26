@@ -1,6 +1,5 @@
 <?php
 use Irediscent\Connection\ConnectionInterface;
-use Irediscent\Connection\SocketConnection;
 use Irediscent\Exception\RedisException;
 
 class Irediscent {
@@ -56,7 +55,7 @@ class Irediscent {
     /**
      * @param string|ConnectionInterface $connection The data source name of the Redis server
      * @param string $password
-     * @param array $options
+     * @param array $database
      */
     public function __construct($connection = null, $password = null, $database = null)
     {
@@ -220,23 +219,28 @@ class Irediscent {
         return $this->format($name, $this->connection->write($args));
     }
 
+    /**
+     * @param $command
+     * @param $response
+     * @return mixed
+     */
     protected function format($command, $response)
     {
-        if(isset($this->formatters[$command]))
+        if(!isset($this->formatters[$command]))
         {
-            if(!isset($this->formattersCache[$command]))
-            {
-                $this->formattersCache[$command] = new $this->formatters[$command];
-            }
-
-            return $this->formattersCache[$command]->format($command, $response);
+            return $response;
         }
 
-        return $response;
+        if(!isset($this->formattersCache[$command]))
+        {
+            $this->formattersCache[$command] = new $this->formatters[$command];
+        }
+
+        return $this->formattersCache[$command]->format($command, $response);
     }
 
     /**
-     * Switch any eval to an evaSha followed by an eval
+     * Switch any eval to an evaSha, followed by an eval if the server returns a NOSCRIPT error.
      *
      * The only time this should not happen is when in a pipeline so we check for that first
      *

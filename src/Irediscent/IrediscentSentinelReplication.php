@@ -1,15 +1,15 @@
 <?php namespace Irediscent;
-use Irediscent\Connection\ConnectionInterface;
-use Irediscent\Connection\SocketConnection;
+
 use Irediscent\DsnProvider\SentinelProvider;
 use Irediscent\Exception\RedisException;
 
 class IrediscentSentinelReplication extends \Irediscent {
 
     /**
-     * @param string|ConnectionInterface $connection The data source name of the Redis server
-     * @param string $password
-     * @param array $options
+     * @param array $sentinels
+     * @param null|string $mastername
+     * @param null $password
+     * @param null $database
      */
     public function __construct(array $sentinels, $mastername, $password = null, $database = null)
     {
@@ -23,24 +23,30 @@ class IrediscentSentinelReplication extends \Irediscent {
      * @param $name
      * @param array $args
      * @return $this
+     * @throws RedisException
      */
     protected function executeCommand($name, array $args = array())
     {
-        try
-        {
-            return parent::executeCommand($name, $args);
-        }
-        catch(RedisException $e)
-        {
-            if(strpos($e->getMessage(), 'READONLY You can\'t write against a read only slave') !== 0)
-            {
-                throw $e;
+        $retry = 5; // Avoid infinite loop
+
+        do {
+            try {
+                return parent::executeCommand($name, $args);
             }
-
-            $this->reconnect();
-
-            return parent::executeCommand($name, $args);
+            catch (RedisException $e) {}
         }
+        while($this->exceptionIsReadonlySlave($e) && $retry--);
+
+        throw $e;
+    }
+
+    /**
+     * @param RedisException $e
+     * @return bool
+     */
+    private function exceptionIsReadonlySlave(RedisException $e)
+    {
+        return strpos($e->getMessage(), 'READONLY You can\'t write against a read only slave') !== 0;
     }
 
 }
