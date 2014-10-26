@@ -39,9 +39,11 @@ abstract class ConnectionAbstract implements ConnectionInterface {
             $this->writeCommand($rawCommand);
         }
 
-        // Read in the results from the pipelined commands
+        $commandCount = count($data);
+
         $responses = array();
-        for ($i = 0; $i < count($data); $i++)
+
+        for ($i = 0; $i < $commandCount; $i++)
         {
             $responses[] = $this->readResponse();
         }

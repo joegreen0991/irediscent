@@ -1,7 +1,6 @@
 <?php namespace Irediscent\Connection\Serializer;
 
 use Irediscent\Exception\RedisException;
-use Irediscent\Exception\UnknownResponseException;
 
 class IRedis implements  SerializerInterface {
 
@@ -10,7 +9,7 @@ class IRedis implements  SerializerInterface {
     public function __construct()
     {
         if (!function_exists('phpiredis_reader_create')) {
-            throw new NotSupportedException(
+            throw new \RuntimeException(
                 'The phpiredis extension must be loaded in order to be able to use this serializer'
             );
         }

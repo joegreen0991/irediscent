@@ -254,7 +254,10 @@ class Irediscent {
         {
             $evalCmd = $arguments[0];
 
-            isset($this->commandSha[$evalCmd]) or $this->commandSha[$evalCmd] = sha1($evalCmd);
+            if(!isset($this->commandSha[$evalCmd]))
+            {
+                $this->commandSha[$evalCmd] = sha1($evalCmd);
+            }
 
             $arguments[0] = $this->commandSha[$evalCmd];
 

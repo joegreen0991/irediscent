@@ -1,10 +1,11 @@
 <?php namespace Irediscent\DsnProvider;
 
 
-interface DsnProviderInterface {
+interface DsnProviderInterface
+{
 
     public function getMasterDsn();
 
     public function getSlavesDsn();
 
-} 
+}

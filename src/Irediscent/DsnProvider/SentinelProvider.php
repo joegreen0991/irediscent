@@ -1,6 +1,5 @@
 <?php namespace Irediscent\DsnProvider;
 
-use Irediscent\Connection\Factory;
 use Irediscent\Connection\ConnectionInterface;
 use Irediscent\Connection\SocketConnection;
 use Irediscent\Exception\ConnectionException;
