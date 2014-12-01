@@ -102,6 +102,6 @@ $sentinels = array(
     '127.0.0.1:26379',
 );
 
-$redis = new Irediscent\IrediscentSentinelReplication($sentinels);
+$redis = new Irediscent\IrediscentSentinelReplication($sentinels, 'mymaster');
 
 ~~~
