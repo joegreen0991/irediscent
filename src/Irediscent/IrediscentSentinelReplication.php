@@ -44,7 +44,7 @@ class IrediscentSentinelReplication extends \Irediscent {
             }
         }
 
-        throw new RedisException("Could not reconnect to master after $this->connectionRetries attempts");
+        throw $e;
     }
 
     /**
