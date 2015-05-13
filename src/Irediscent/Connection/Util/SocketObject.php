@@ -5,9 +5,24 @@
  */
 class SocketObject
 {
-    public function open($host, $port = null, &$errno = null, &$errstr = null, $timeout = null)
+    public function open($host, $port = null, &$errno = null, &$errstr = null, $timeout = null, $readwriteTimeout = null)
     {
-        return @fsockopen($host, $port, $errno, $errstr, $timeout);
+        $resource = @fsockopen($host, $port, $errno, $errstr, $timeout);
+
+        if(!$resource)
+        {
+            return false;
+        }
+
+        if (isset($readwriteTimeout)) {
+            $readwriteTimeout = (float) $readwriteTimeout;
+            $readwriteTimeout = $readwriteTimeout > 0 ? $readwriteTimeout : -1;
+            $timeoutSeconds  = floor($readwriteTimeout);
+            $timeoutUSeconds = ($readwriteTimeout - $timeoutSeconds) * 1000000;
+            stream_set_timeout($resource, $timeoutSeconds, $timeoutUSeconds);
+        }
+
+        return $resource;
     }
 
     public function write($handle, $data)

@@ -10,6 +10,8 @@ class SocketConnection extends ConnectionAbstract {
 
     const DEFAULT_TIMEOUT = 5.0;
 
+    const DEFAULT_RW_TIMEOUT = 5.0;
+
     const CRLF = "\r\n";
 
     protected $timeout;
@@ -23,9 +25,11 @@ class SocketConnection extends ConnectionAbstract {
      */
     protected $redis;
 
-    public function __construct($dsn = null, $timeout = null)
+    public function __construct($dsn = null, $timeout = null, $readWriteTimeout = null)
     {
         $this->timeout = is_null($timeout) ? self::DEFAULT_TIMEOUT : (float)$timeout;
+
+        $this->readWriteTimeout = is_null($readWriteTimeout) ? self::DEFAULT_RW_TIMEOUT : (float)$readWriteTimeout;
 
         $this->socket = new SocketObject();
 
@@ -41,7 +45,7 @@ class SocketConnection extends ConnectionAbstract {
     {
         $connection = $this->dsn->getMasterDsn();
 
-        $this->redis = $this->socket->open($connection['host'], $connection['port'], $errno, $errstr, $this->timeout);
+        $this->redis = $this->socket->open($connection['host'], $connection['port'], $errno, $errstr, $this->timeout, $this->readWriteTimeout);
 
         if ($this->redis === false)
         {
